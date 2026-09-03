@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Survivor</title>
+<style>
+  :root {
+    --bg: #f6f6f4; --surface: #ffffff; --line: #e3e3df; --line-strong: #c9c9c3;
+    --ink: #1a1a19; --ink-2: #4a4a47; --ink-3: #7a7a75;
+    --good: #0ca30c; --good-bg: #e3f6e3; --good-ink: #0b5d0b;
+    --bad: #d03b3b; --bad-bg: #fbe4e4; --bad-ink: #8f1f1f;
+    --warn: #fab219; --warn-bg: #fff3d1; --warn-ink: #6b4a00;
+    --future-bg: #f1f1ee; --na-bg: #e9e9e5; --lock-bg: #e6e6e2;
+    --accent: #1f4e79;
+    --radius: 10px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #141413; --surface: #1e1e1c; --line: #30302d; --line-strong: #45453f;
+      --ink: #ecece8; --ink-2: #b9b9b2; --ink-3: #85857e;
+      --good-bg: #163a16; --good-ink: #8fe08f;
+      --bad-bg: #3f1a1a; --bad-ink: #f0a0a0;
+      --warn-bg: #3f3210; --warn-ink: #f5d27a;
+      --future-bg: #232321; --na-bg: #1b1b19; --lock-bg: #292926;
+      --accent: #7fb2e6;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--ink);
+    font: 15px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 20px 16px 48px; }
+  h1 { font-size: 22px; margin: 0; letter-spacing: -0.01em; }
+  h2 { font-size: 16px; margin: 0 0 12px; color: var(--ink-2); text-transform: uppercase; letter-spacing: .06em; font-weight: 600; }
+  .muted { color: var(--ink-3); }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; margin-top: 16px; }
+  .banner { border-left: 4px solid var(--warn); }
+  .header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 16px; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-top: 14px; }
+  .stat { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+  .stat .label { font-size: 12px; color: var(--ink-3); text-transform: uppercase; letter-spacing: .05em; }
+  .stat .value { font-size: 22px; font-weight: 650; margin-top: 2px; font-variant-numeric: tabular-nums; }
+  .stat .sub { font-size: 12.5px; color: var(--ink-2); margin-top: 2px; }
+
+  .gridwrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid var(--line); border-radius: 8px; }
+  table.grid { border-collapse: separate; border-spacing: 0; width: max-content; min-width: 100%; font-size: 13px; }
+  table.grid th, table.grid td { padding: 0; border-bottom: 1px solid var(--line); border-right: 1px solid var(--line); text-align: center; white-space: nowrap; }
+  table.grid th { background: var(--surface); font-weight: 600; color: var(--ink-2); font-size: 12px; padding: 8px 6px; position: sticky; top: 0; z-index: 2; }
+  table.grid th.cur { color: var(--accent); }
+  table.grid th:first-child, table.grid td:first-child { position: sticky; left: 0; z-index: 3; background: var(--surface); text-align: left; padding: 6px 10px; min-width: 150px; border-right: 1px solid var(--line-strong); }
+  table.grid th:first-child { z-index: 4; }
+  table.grid tr:last-child td { border-bottom: 0; }
+  td .who { font-weight: 600; }
+  td .who small { font-weight: 400; color: var(--ink-3); margin-left: 4px; }
+  td .status { display: block; font-size: 11.5px; color: var(--ink-3); }
+  tr.out td { opacity: .55; }
+  tr.out td:first-child { opacity: 1; color: var(--ink-3); }
+  tr.group-start td { border-top: 2px solid var(--line-strong); }
+  .cell { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 58px; height: 46px; margin: 3px; border-radius: 6px; font-weight: 600; font-size: 13px; }
+  .cell small { font-size: 10.5px; font-weight: 500; letter-spacing: .04em; opacity: .9; }
+  .cell.won { background: var(--good-bg); color: var(--good-ink); }
+  .cell.lost, .cell.tie, .cell.missed { background: var(--bad-bg); color: var(--bad-ink); }
+  .cell.pending, .cell.nopick { background: var(--warn-bg); color: var(--warn-ink); }
+  .cell.nopick { border: 1.5px dashed var(--warn); font-weight: 500; }
+  .cell.locked { background: var(--lock-bg); color: var(--ink-3); font-weight: 500; }
+  .cell.future { background: var(--future-bg); }
+  .cell.na { background: repeating-linear-gradient(135deg, var(--na-bg) 0 6px, transparent 6px 12px); color: var(--ink-3); font-weight: 400; }
+  .cell.gone { background: transparent; }
+  .legend { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 10px; font-size: 12.5px; color: var(--ink-2); }
+  .legend span::before { content: ""; display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -2px; }
+  .legend .l-won::before { background: var(--good-bg); border: 1px solid var(--good); }
+  .legend .l-lost::before { background: var(--bad-bg); border: 1px solid var(--bad); }
+  .legend .l-pending::before { background: var(--warn-bg); border: 1px solid var(--warn); }
+  .legend .l-locked::before { background: var(--lock-bg); border: 1px solid var(--line-strong); }
+  .legend .l-future::before { background: var(--future-bg); border: 1px solid var(--line-strong); }
+
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .two > * { min-width: 0; }
+  @media (max-width: 820px) { .two { grid-template-columns: 1fr; } }
+  details { border-top: 1px solid var(--line); padding: 8px 0; }
+  details:first-of-type { border-top: 0; }
+  summary { cursor: pointer; display: flex; justify-content: space-between; gap: 8px; align-items: baseline; list-style: none; }
+  summary::-webkit-details-marker { display: none; }
+  summary .name { font-weight: 600; }
+  summary .meta { font-size: 12.5px; color: var(--ink-3); white-space: nowrap; }
+  .chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+  .chip { font-size: 11.5px; padding: 2px 7px; border: 1px solid var(--line-strong); border-radius: 999px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+  .chip.bye { text-decoration: line-through; opacity: .55; }
+  .badge { display: inline-block; font-size: 11px; padding: 1px 7px; border-radius: 999px; font-weight: 600; letter-spacing: .02em; vertical-align: 1px; }
+  .badge.alive { background: var(--good-bg); color: var(--good-ink); }
+  .badge.out { background: var(--bad-bg); color: var(--bad-ink); }
+  .badge.open { background: var(--warn-bg); color: var(--warn-ink); }
+  .badge.win { background: var(--good-bg); color: var(--good-ink); }
+
+  .tablewrap { overflow-x: auto; }
+  table.plain { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  table.plain td { white-space: nowrap; }
+  table.plain th, table.plain td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  table.plain th { font-size: 12px; color: var(--ink-3); text-transform: uppercase; letter-spacing: .05em; font-weight: 600; }
+  table.plain td.num, table.plain th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  table.plain tr:last-child td { border-bottom: 0; }
+
+  .rules p { margin: 6px 0; }
+  .rules ol { margin: 6px 0 0 18px; padding: 0; }
+  .rules li { margin: 4px 0; }
+  .byes { font-size: 12.5px; color: var(--ink-2); columns: 2; column-gap: 24px; margin-top: 8px; }
+  @media (max-width: 600px) { .byes { columns: 1; } .stat .value { font-size: 19px; } table.grid th:first-child, table.grid td:first-child { min-width: 118px; padding: 6px 8px; } .cell { width: 52px; height: 42px; } }
+  footer { margin-top: 20px; font-size: 12px; color: var(--ink-3); text-align: center; }
+  .payout-big { font-size: 28px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .empty { color: var(--ink-3); font-style: italic; }
+</style>
+</head>
+<body>
+<div class="wrap" id="app"><div class="card"><span class="muted">Loading…</span></div></div>
+
+<script>
+(async function () {
+  const qs = new URLSearchParams(location.search);
+  const file = (qs.get('data') || 'league').replace(/[^a-z0-9_-]/gi, '');
+  const app = document.getElementById('app');
+  let L;
+  try {
+    const r = await fetch(`data/${file}.json?t=${Date.now()}`, { cache: 'no-store' });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    L = await r.json();
+  } catch (e) {
+    app.innerHTML = `<div class="card">Could not load <code>data/${esc(file)}.json</code> (${esc(String(e.message))}).</div>`;
+    return;
+  }
+  render(L);
+
+  // ---------- helpers ----------
+  function esc(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function money(n) { return '$' + Number(n).toLocaleString('en-US', { maximumFractionDigits: 2 }); }
+  function fmtLock(iso) {
+    const d = new Date(iso);
+    return d.toLocaleString('en-US', { timeZone: 'America/New_York', weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) + ' ET';
+  }
+  function countdown(iso) {
+    const ms = new Date(iso) - Date.now();
+    if (ms <= 0) return 'locked';
+    const h = Math.floor(ms / 36e5), d = Math.floor(h / 24), m = Math.floor((ms % 36e5) / 6e4);
+    if (d >= 1) return `${d}d ${h % 24}h left`;
+    if (h >= 1) return `${h}h ${m}m left`;
+    return `${m}m left`;
+  }
+  function buyIn(L, n) { const s = L.rules.buyInSchedule; return s[Math.min(n, s.length) - 1]; }
+
+  // ---------- derived ----------
+  function derive(L) {
+    const cw = L.currentWeek, wk = L.weeks[String(cw)] || {};
+    const now = Date.now(), lockTs = wk.lock ? new Date(wk.lock).getTime() : Infinity;
+    const locked = now >= lockTs;
+    const showPicks = !!L.showCurrentWeekPicks || locked;
+    const byP = {}; L.participants.forEach(p => byP[p.id] = { p, entries: [] });
+    L.entries.forEach(e => (byP[e.participantId] || (byP[e.participantId] = { p: { id: e.participantId, name: e.participantId }, entries: [] })).entries.push(e));
+    Object.values(byP).forEach(g => g.entries.sort((a, b) => a.entryNumber - b.entryNumber));
+    const pot = L.entries.reduce((s, e) => s + buyIn(L, e.entryNumber), 0);
+    const alive = L.entries.filter(e => e.status === 'alive' || e.status === 'winner');
+    const winners = L.entries.filter(e => e.status === 'winner');
+    return { cw, wk, locked, showPicks, byP, pot, alive, winners, lockTs };
+  }
+
+  function cellFor(L, D, e, w) {
+    const pick = e.picks[String(w)];
+    const res = (L.results[String(w)] || {})[pick];
+    if (w < e.startWeek) return { cls: 'na', main: '—', sub: '' };
+    if (e.eliminatedWeek != null && w > e.eliminatedWeek) return { cls: 'gone', main: '', sub: '' };
+    if (e.eliminatedWeek === w && e.eliminationReason === 'missed') return { cls: 'missed', main: 'none', sub: 'no pick' };
+    if (pick && res === 'W') return { cls: 'won', main: pick, sub: 'W' };
+    if (pick && res === 'L') return { cls: 'lost', main: pick, sub: 'L' };
+    if (pick && res === 'T') return { cls: 'tie', main: pick, sub: 'TIE' };
+    if (w === D.cw) {
+      if (!pick) return (e.status === 'alive') ? { cls: 'nopick', main: 'no pick', sub: 'yet' } : { cls: 'future', main: '', sub: '' };
+      if (!D.showPicks) return { cls: 'locked', main: 'locked', sub: '' };
+      return { cls: 'pending', main: pick, sub: 'pending' };
+    }
+    if (w < D.cw && pick) return { cls: 'pending', main: pick, sub: 'pending' };
+    return { cls: 'future', main: '', sub: '' };
+  }
+
+  // ---------- render ----------
+  function render(L) {
+    const D = derive(L);
+    const weeksN = Object.keys(L.weeks).map(Number).sort((a, b) => a - b);
+    const html = [];
+
+    // Header
+    const people = Object.keys(D.byP).length;
+    html.push(`<div class="card">
+      <div class="header"><h1>${esc(L.leagueName)}</h1>
+        <span class="muted">${L.seasonComplete ? 'Season complete' : `Week ${D.cw} of ${weeksN.length}`}${L.lastUpdated ? ` · updated ${esc(L.lastUpdated)}` : ''}</span></div>
+      <div class="stats">
+        <div class="stat"><div class="label">Pot</div><div class="value">${money(D.pot)}</div><div class="sub">${L.entries.length} entr${L.entries.length === 1 ? 'y' : 'ies'} · ${people} ${people === 1 ? 'person' : 'people'}</div></div>
+        <div class="stat"><div class="label">Alive</div><div class="value">${D.alive.length} <span class="muted" style="font-size:15px;font-weight:500">/ ${L.entries.length}</span></div><div class="sub">${L.entries.length - D.alive.length} eliminated</div></div>
+        ${L.seasonComplete ? '' : `<div class="stat"><div class="label">Week ${D.cw} picks lock</div><div class="value" style="font-size:17px">${D.wk.lock ? esc(fmtLock(D.wk.lock)) : '—'}</div><div class="sub">${D.wk.lock ? esc(countdown(D.wk.lock)) : ''}${D.wk.byes && D.wk.byes.length ? ` · byes: ${D.wk.byes.join(', ')}` : ''}</div></div>`}
+        ${L.seasonComplete ? '' : `<div class="stat"><div class="label">Week ${D.cw} picks</div><div class="value" style="font-size:17px">${D.showPicks ? 'Visible' : 'Hidden until kickoff'}</div><div class="sub">${D.alive.filter(e => !e.picks[String(D.cw)] && e.status === 'alive').length} alive entr${D.alive.filter(e => !e.picks[String(D.cw)] && e.status === 'alive').length === 1 ? 'y' : 'ies'} still without a pick</div></div>`}
+      </div></div>`);
+
+    if (!L.entries.length) {
+      html.push(`<div class="card banner">No entries yet. The commissioner adds participants and picks each week; this page updates automatically.</div>`);
+    }
+
+    // Standings grid
+    const groups = Object.values(D.byP).map(g => ({ ...g, anyAlive: g.entries.some(e => e.status === 'alive' || e.status === 'winner'),
+      bestWeek: Math.max(...g.entries.map(e => e.eliminatedWeek == null ? 99 : e.eliminatedWeek)) }))
+      .sort((a, b) => (b.anyAlive - a.anyAlive) || (b.bestWeek - a.bestWeek) || a.p.name.localeCompare(b.p.name));
+    let rows = '';
+    groups.forEach(g => {
+      const ents = [...g.entries].sort((a, b) => ((b.status === 'alive' || b.status === 'winner') - (a.status === 'alive' || a.status === 'winner')) || a.entryNumber - b.entryNumber);
+      ents.forEach((e, i) => {
+        const out = !(e.status === 'alive' || e.status === 'winner');
+        const st = e.status === 'winner' ? 'Winner' : out ? `Out W${e.eliminatedWeek}${e.eliminationReason ? ' · ' + e.eliminationReason : ''}` : 'Alive';
+        rows += `<tr class="${out ? 'out' : ''} ${i === 0 ? 'group-start' : ''}"><td><span class="who">${esc(g.p.name)}<small>#${e.entryNumber}</small></span><span class="status">${esc(st)}</span></td>`;
+        weeksN.forEach(w => { const c = cellFor(L, D, e, w); rows += `<td><div class="cell ${c.cls}" title="Week ${w}${c.main ? ': ' + esc(c.main) : ''}">${esc(c.main)}${c.sub ? `<small>${esc(c.sub)}</small>` : ''}</div></td>`; });
+        rows += '</tr>';
+      });
+    });
+    html.push(`<div class="card"><h2>Standings</h2>
+      <div class="gridwrap"><table class="grid"><thead><tr><th>Entry</th>${weeksN.map(w => `<th class="${w === D.cw ? 'cur' : ''}">W${w}</th>`).join('')}</tr></thead>
+      <tbody>${rows || `<tr><td colspan="${weeksN.length + 1}" class="empty" style="text-align:left">No entries.</td></tr>`}</tbody></table></div>
+      <div class="legend"><span class="l-won">Won</span><span class="l-lost">Lost / tie / no pick</span><span class="l-pending">Pending this week</span><span class="l-locked">Locked until kickoff</span><span class="l-future">Future</span></div>
+      </div>`);
+
+    // Alive list + tracker
+    const allTeams = Object.keys(L.teams).sort();
+    const aliveHtml = D.alive.length ? D.alive
+      .sort((a, b) => (D.byP[a.participantId].p.name.localeCompare(D.byP[b.participantId].p.name)) || a.entryNumber - b.entryNumber)
+      .map(e => {
+        const used = new Set(Object.values(e.picks));
+        const remaining = allTeams.filter(t => !used.has(t));
+        const byes = new Set(D.wk.byes || []);
+        const hasPick = !!e.picks[String(D.cw)];
+        return `<details><summary><span class="name">${esc(D.byP[e.participantId].p.name)} <span class="muted">#${e.entryNumber}</span></span>
+          <span class="meta">${used.size} used · ${remaining.length} left${L.seasonComplete ? '' : hasPick ? ' · pick in' : ' · <b>no pick yet</b>'}</span></summary>
+          <div class="chips">${remaining.map(t => `<span class="chip ${byes.has(t) ? 'bye' : ''}" title="${esc(L.teams[t])}${byes.has(t) ? ' — bye this week' : ''}">${t}</span>`).join('')}</div></details>`;
+      }).join('') : `<div class="empty">Nobody is alive.</div>`;
+
+    const trackerRows = Object.values(D.byP).sort((a, b) => a.p.name.localeCompare(b.p.name)).map(g => {
+      const n = g.entries.length, max = L.rules.maxEntriesPerPerson;
+      const anyAlive = g.entries.some(e => e.status === 'alive' || e.status === 'winner');
+      const last = g.entries[g.entries.length - 1];
+      let next = '—', badge = '';
+      if (g.entries.some(e => e.status === 'winner')) badge = `<span class="badge win">Winner</span>`;
+      else if (anyAlive) badge = `<span class="badge alive">Alive</span>`;
+      else if (n >= max) badge = `<span class="badge out">Out · max entries</span>`;
+      else if (last && last.eliminatedWeek === D.cw - 1 && !D.locked && !L.seasonComplete) { badge = `<span class="badge open">Rebuy open</span>`; next = money(buyIn(L, n + 1)) + ` by ${esc(fmtLock(D.wk.lock))}`; }
+      else badge = `<span class="badge out">Out</span>`;
+      const ent = g.entries.map(e => `#${e.entryNumber} ${money(buyIn(L, e.entryNumber))} · ${e.status === 'alive' ? 'alive' : e.status === 'winner' ? 'winner' : 'out W' + e.eliminatedWeek}`).join('<br>');
+      return `<tr><td>${esc(g.p.name)}<br>${badge}</td><td class="num">${n} / ${max}</td><td>${ent}</td><td>${next}</td></tr>`;
+    }).join('');
+
+    html.push(`<div class="two">
+      <div class="card"><h2>Still alive · remaining teams</h2>${aliveHtml}</div>
+      <div class="card"><h2>Entries &amp; rebuys</h2>
+        <div class="tablewrap"><table class="plain"><thead><tr><th>Person</th><th class="num">Entries</th><th>Buy-ins</th><th>Next rebuy</th></tr></thead>
+        <tbody>${trackerRows || `<tr><td colspan="4" class="empty">No participants yet.</td></tr>`}</tbody></table></div>
+        <p class="muted" style="font-size:12px;margin:10px 0 0">Buy-ins: ${L.rules.buyInSchedule.map((b, i) => `${i + 1}${['st', 'nd', 'rd'][i] || 'th'} entry ${money(b)}`).join(' · ')}. Payment status is tracked by the commissioner offline.</p>
+      </div></div>`);
+
+    // Payout panel
+    if (L.seasonComplete || D.winners.length || (L.payouts && L.payouts.length)) {
+      const pays = (L.payouts && L.payouts.length) ? L.payouts : D.winners.map(e => ({ entryId: e.id, amount: D.pot / D.winners.length }));
+      const nameOf = id => { const e = L.entries.find(x => x.id === id); return e ? `${D.byP[e.participantId].p.name} #${e.entryNumber}` : id; };
+      html.push(`<div class="card"><h2>Payout</h2><div class="payout-big">${money(D.pot)} pot</div>
+        <table class="plain" style="margin-top:8px"><thead><tr><th>Winner</th><th class="num">Amount</th></tr></thead>
+        <tbody>${pays.map(p => `<tr><td>${esc(nameOf(p.entryId))} <span class="badge win">Winner</span></td><td class="num">${money(p.amount)}</td></tr>`).join('') || `<tr><td colspan="2" class="empty">Pending.</td></tr>`}</tbody></table></div>`);
+    }
+
+    // Rules
+    const byeList = weeksN.filter(w => (L.weeks[String(w)].byes || []).length).map(w => `<div><b>W${w}:</b> ${L.weeks[String(w)].byes.join(', ')}</div>`).join('');
+    html.push(`<div class="card rules"><h2>Rules</h2>
+      <ol>
+        <li>${weeksN.length} regular-season weeks. Each week, every live entry picks one team to <b>win outright</b>.</li>
+        <li>Loss = eliminated. Tie = ${L.rules.tie === 'loss' ? 'eliminated' : 'push (survive; team is still used)'}. Missed pick = ${L.rules.missedPick === 'eliminated' ? 'eliminated' : 'auto-assigned'}.</li>
+        <li>A team can be used <b>once per entry</b> across the season.</li>
+        <li>Buy-ins per person, in order: ${L.rules.buyInSchedule.map(money).join(' → ')}. Max ${L.rules.maxEntriesPerPerson} entries per person.</li>
+        <li>${esc(L.rules.rebuyText)}</li>
+        <li>Picks lock at the first kickoff of the week (${D.wk.lock ? 'this week: ' + esc(fmtLock(D.wk.lock)) : 'usually Thursday night'}) and are hidden until then.</li>
+        <li>Pot = all buy-ins. ${esc(L.rules.payoutText)}</li>
+      </ol>
+      <details style="margin-top:10px;border-top:0"><summary><span class="name muted">Bye weeks</span><span class="meta">show</span></summary><div class="byes">${byeList || '<span class="empty">none listed</span>'}</div></details>
+    </div>`);
+
+    html.push(`<footer>Commissioner: Nikhil. Questions or corrections — send him a note. Data updates within a minute of a change.</footer>`);
+    app.innerHTML = html.join('');
+    document.title = `${L.leagueName} — Week ${D.cw}`;
+  }
+})();
+</script>
+</body>
+</html>

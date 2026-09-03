@@ -1,0 +1,193 @@
+{
+  "leagueName": "Office Survivor 2026",
+  "season": 2026,
+  "currentWeek": 1,
+  "showCurrentWeekPicks": false,
+  "seasonComplete": false,
+  "lastUpdated": "2026-09-03",
+  "rules": {
+    "payout": "winner-take-all",
+    "payoutText": "Last surviving entry wins the full pot. If multiple entries survive Week 18, they split it equally. If every remaining entry is eliminated in the same week, those entries split the pot.",
+    "tie": "loss",
+    "missedPick": "eliminated",
+    "maxEntriesPerPerson": 3,
+    "buyInSchedule": [
+      20,
+      50,
+      100
+    ],
+    "rebuyText": "A person may add an entry only after their prior entry is eliminated, and only before the following week's first kickoff. Skip that window and the rebuy is gone. Max 3 entries per person.",
+    "oneTeamPerEntry": true
+  },
+  "weeks": {
+    "1": {
+      "lock": "2026-09-09T20:20:00-04:00",
+      "byes": [],
+      "note": "Season opener is Wednesday Sept 9 (NE at SEA, 8:20 PM ET)"
+    },
+    "2": {
+      "lock": "2026-09-17T20:15:00-04:00",
+      "byes": [],
+      "note": "Thursday night kickoff"
+    },
+    "3": {
+      "lock": "2026-09-24T20:15:00-04:00",
+      "byes": [],
+      "note": "Thursday night kickoff"
+    },
+    "4": {
+      "lock": "2026-10-01T20:15:00-04:00",
+      "byes": [],
+      "note": "Thursday night kickoff"
+    },
+    "5": {
+      "lock": "2026-10-08T20:15:00-04:00",
+      "byes": [
+        "CAR",
+        "KC"
+      ],
+      "note": "Thursday night kickoff"
+    },
+    "6": {
+      "lock": "2026-10-15T20:15:00-04:00",
+      "byes": [
+        "CIN",
+        "DET",
+        "MIA",
+        "MIN"
+      ],
+      "note": "Thursday night kickoff"
+    },
+    "7": {
+      "lock": "2026-10-22T20:15:00-04:00",
+      "byes": [
+        "BUF",
+        "JAX",
+        "LAC",
+        "WAS"
+      ],
+      "note": "Thursday night kickoff"
+    },
+    "8": {
+      "lock": "2026-10-29T20:15:00-04:00",
+      "byes": [
+        "HOU",
+        "NO",
+        "NYG",
+        "SF"
+      ],
+      "note": "Thursday night kickoff"
+    },
+    "9": {
+      "lock": "2026-11-05T20:15:00-05:00",
+      "byes": [
+        "PIT",
+        "TEN"
+      ],
+      "note": "Thursday night kickoff"
+    },
+    "10": {
+      "lock": "2026-11-12T20:15:00-05:00",
+      "byes": [
+        "CHI",
+        "DEN",
+        "PHI",
+        "TB"
+      ],
+      "note": "Thursday night kickoff"
+    },
+    "11": {
+      "lock": "2026-11-19T20:15:00-05:00",
+      "byes": [
+        "ATL",
+        "CLE",
+        "GB",
+        "LAR",
+        "NE",
+        "SEA"
+      ],
+      "note": "Thursday night kickoff"
+    },
+    "12": {
+      "lock": "2026-11-26T12:30:00-05:00",
+      "byes": [],
+      "note": "Thanksgiving \u2014 first game 12:30 PM ET"
+    },
+    "13": {
+      "lock": "2026-12-03T20:15:00-05:00",
+      "byes": [
+        "BAL",
+        "IND",
+        "LV",
+        "NYJ"
+      ],
+      "note": "Thursday night kickoff"
+    },
+    "14": {
+      "lock": "2026-12-10T20:15:00-05:00",
+      "byes": [
+        "ARI",
+        "DAL"
+      ],
+      "note": "Thursday night kickoff"
+    },
+    "15": {
+      "lock": "2026-12-17T20:15:00-05:00",
+      "byes": [],
+      "note": "Thursday night kickoff"
+    },
+    "16": {
+      "lock": "2026-12-24T20:15:00-05:00",
+      "byes": [],
+      "note": "Thursday night kickoff"
+    },
+    "17": {
+      "lock": "2026-12-31T20:15:00-05:00",
+      "byes": [],
+      "note": "Thursday night kickoff"
+    },
+    "18": {
+      "lock": "2027-01-09T16:30:00-05:00",
+      "byes": [],
+      "note": "No Thursday game in Week 18 \u2014 Saturday slate assumed; confirm when schedule is final"
+    }
+  },
+  "teams": {
+    "ARI": "Arizona Cardinals",
+    "ATL": "Atlanta Falcons",
+    "BAL": "Baltimore Ravens",
+    "BUF": "Buffalo Bills",
+    "CAR": "Carolina Panthers",
+    "CHI": "Chicago Bears",
+    "CIN": "Cincinnati Bengals",
+    "CLE": "Cleveland Browns",
+    "DAL": "Dallas Cowboys",
+    "DEN": "Denver Broncos",
+    "DET": "Detroit Lions",
+    "GB": "Green Bay Packers",
+    "HOU": "Houston Texans",
+    "IND": "Indianapolis Colts",
+    "JAX": "Jacksonville Jaguars",
+    "KC": "Kansas City Chiefs",
+    "LAC": "Los Angeles Chargers",
+    "LAR": "Los Angeles Rams",
+    "LV": "Las Vegas Raiders",
+    "MIA": "Miami Dolphins",
+    "MIN": "Minnesota Vikings",
+    "NE": "New England Patriots",
+    "NO": "New Orleans Saints",
+    "NYG": "New York Giants",
+    "NYJ": "New York Jets",
+    "PHI": "Philadelphia Eagles",
+    "PIT": "Pittsburgh Steelers",
+    "SEA": "Seattle Seahawks",
+    "SF": "San Francisco 49ers",
+    "TB": "Tampa Bay Buccaneers",
+    "TEN": "Tennessee Titans",
+    "WAS": "Washington Commanders"
+  },
+  "participants": [],
+  "entries": [],
+  "results": {},
+  "payouts": []
+}
