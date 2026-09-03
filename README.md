@@ -99,17 +99,18 @@ Cowork sets `seasonComplete`, marks winner(s), writes `payouts` (equal split of 
 | `Jones paid $50 Venmo` | Ledger update only |
 | `Who owes money?` | Unpaid rows from the ledger |
 | `Close out the season` | Winners, payouts, disbursement checklist |
-| `Fix: Week 2 Smith-1 should be KC not KC` | Edit + re-validate + push (git history keeps the audit trail) |
+| `Fix: Week 2 Smith-1 should be KC, not PHI` | Edit + re-validate + push (git history keeps the audit trail) |
 
 Entry shorthand: `Lastname-N` maps to `<participantId>-N`; a bare last name means that person's live entry.
 
-## Local development
+## How updates get published
+
+The working copy lives in OneDrive at `%OneDriveCommercial%\Claude\survivor\site\` (this repo's files, no `.git`). Next to it: `ledger.json` (private) and `publish.py`, which pushes changed files straight to `main` through the GitHub Contents API — no clone, no git on the machine required.
 
 ```powershell
-git clone https://github.com/nikhilraman-cloud/survivor.git
-cd survivor
-node validate.js data/league.json
-python -m http.server 8000     # then open http://localhost:8000/?data=sample
+cd "$env:OneDriveCommercial\Claude\survivor"
+node site\validate.js site\data\league.json --ledger ledger.json
+$env:GITHUB_TOKEN = "<token>"; python publish.py "Week 3 picks"
 ```
 
-Deploys on push to `main`; GitHub Pages picks it up within about a minute.
+Cowork does this for you; the token comes from an env var (or a `.token` file beside `publish.py`, never committed). To preview locally: `python -m http.server 8000` inside `site\` and open `http://localhost:8000/?data=sample`. GitHub Pages picks up pushes within about a minute.
