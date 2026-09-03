@@ -186,8 +186,26 @@
     "TEN": "Tennessee Titans",
     "WAS": "Washington Commanders"
   },
-  "participants": [],
-  "entries": [],
+  "participants": [
+    {
+      "id": "nosher",
+      "name": "N. Osher"
+    }
+  ],
+  "entries": [
+    {
+      "id": "nosher-1",
+      "participantId": "nosher",
+      "entryNumber": 1,
+      "startWeek": 1,
+      "status": "alive",
+      "eliminatedWeek": null,
+      "eliminationReason": null,
+      "picks": {
+        "1": "LAC"
+      }
+    }
+  ],
   "results": {},
   "payouts": []
 }
