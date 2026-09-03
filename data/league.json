@@ -190,6 +190,10 @@
     {
       "id": "nosher",
       "name": "N. Osher"
+    },
+    {
+      "id": "dsoble",
+      "name": "D. Soble"
     }
   ],
   "entries": [
@@ -203,6 +207,18 @@
       "eliminationReason": null,
       "picks": {
         "1": "LAC"
+      }
+    },
+    {
+      "id": "dsoble-1",
+      "participantId": "dsoble",
+      "entryNumber": 1,
+      "startWeek": 1,
+      "status": "alive",
+      "eliminatedWeek": null,
+      "eliminationReason": null,
+      "picks": {
+        "1": "JAX"
       }
     }
   ],
