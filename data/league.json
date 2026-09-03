@@ -194,6 +194,10 @@
     {
       "id": "dsoble",
       "name": "D. Soble"
+    },
+    {
+      "id": "nraman",
+      "name": "N. Raman"
     }
   ],
   "entries": [
@@ -212,6 +216,18 @@
     {
       "id": "dsoble-1",
       "participantId": "dsoble",
+      "entryNumber": 1,
+      "startWeek": 1,
+      "status": "alive",
+      "eliminatedWeek": null,
+      "eliminationReason": null,
+      "picks": {
+        "1": "JAX"
+      }
+    },
+    {
+      "id": "nraman-1",
+      "participantId": "nraman",
       "entryNumber": 1,
       "startWeek": 1,
       "status": "alive",
