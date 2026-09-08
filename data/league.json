@@ -214,6 +214,10 @@
     {
       "id": "btucker",
       "name": "B. Tucker"
+    },
+    {
+      "id": "cnobili",
+      "name": "C. Nobili"
     }
   ],
   "entries": [
@@ -292,6 +296,18 @@
     {
       "id": "btucker-1",
       "participantId": "btucker",
+      "entryNumber": 1,
+      "startWeek": 1,
+      "status": "alive",
+      "eliminatedWeek": null,
+      "eliminationReason": null,
+      "picks": {
+        "1": "LAC"
+      }
+    },
+    {
+      "id": "cnobili-1",
+      "participantId": "cnobili",
       "entryNumber": 1,
       "startWeek": 1,
       "status": "alive",
