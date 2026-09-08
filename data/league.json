@@ -4,7 +4,7 @@
   "currentWeek": 1,
   "showCurrentWeekPicks": false,
   "seasonComplete": false,
-  "lastUpdated": "2026-09-03",
+  "lastUpdated": "2026-09-08",
   "rules": {
     "payout": "winner-take-all",
     "payoutText": "Last surviving entry wins the full pot. If multiple entries survive Week 18, they split it equally. If every remaining entry is eliminated in the same week, those entries split the pot.",
@@ -198,6 +198,18 @@
     {
       "id": "nraman",
       "name": "N. Raman"
+    },
+    {
+      "id": "hweiss",
+      "name": "H. Weiss"
+    },
+    {
+      "id": "nweiss",
+      "name": "N. Weiss"
+    },
+    {
+      "id": "rjahn",
+      "name": "R. Jahn"
     }
   ],
   "entries": [
@@ -235,6 +247,42 @@
       "eliminationReason": null,
       "picks": {
         "1": "JAX"
+      }
+    },
+    {
+      "id": "hweiss-1",
+      "participantId": "hweiss",
+      "entryNumber": 1,
+      "startWeek": 1,
+      "status": "alive",
+      "eliminatedWeek": null,
+      "eliminationReason": null,
+      "picks": {
+        "1": "LAC"
+      }
+    },
+    {
+      "id": "nweiss-1",
+      "participantId": "nweiss",
+      "entryNumber": 1,
+      "startWeek": 1,
+      "status": "alive",
+      "eliminatedWeek": null,
+      "eliminationReason": null,
+      "picks": {
+        "1": "LAC"
+      }
+    },
+    {
+      "id": "rjahn-1",
+      "participantId": "rjahn",
+      "entryNumber": 1,
+      "startWeek": 1,
+      "status": "alive",
+      "eliminatedWeek": null,
+      "eliminationReason": null,
+      "picks": {
+        "1": "LAC"
       }
     }
   ],
