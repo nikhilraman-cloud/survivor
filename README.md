@@ -22,6 +22,8 @@ Static GitHub Pages dashboard for an office NFL survivor league. One commissione
 
 The dashboard has a **Your picks** panel at the top: pick your name from the dropdown and it shows, per entry, the teams you have already used (week-labelled, green if the pick won, red if it lost or tied) and the teams you still have available. The browser remembers your name, so it is one tap on a return visit. **Teams used & available** lower down shows the same thing for everyone, collapsed.
 
+Team abbreviations carry a **colored left edge** keyed to that team's brand color — in the standings cells and on every chip — so you can scan the grid without reading every code. The cell fill still means won / lost / pending; identity rides on the edge so the two never fight. Thirty-two teams cannot have thirty-two distinguishable colors, so a couple of pairs collide (Falcons/Texans red, Bengals/Broncos orange) and four near-black primaries use the iconic secondary instead (Raiders and Cowboys silver, Bears and Browns orange). The three letters remain the identity. In dark mode the stripe is lifted via `color-mix` so dark navies stay visible.
+
 A submitted pick for the current week is never named before kickoff — the panel says "pick is in — hidden until kickoff" and that team stays in your available list, so nobody can work out a pending pick by comparing lists.
 
 ## Rules encoded
