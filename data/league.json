@@ -234,6 +234,10 @@
     {
       "id": "rhunter",
       "name": "R. Hunter"
+    },
+    {
+      "id": "mnoesen",
+      "name": "M. Noesen"
     }
   ],
   "entries": [
@@ -379,6 +383,18 @@
       "eliminationReason": null,
       "picks": {
         "1": "LAC"
+      }
+    },
+    {
+      "id": "mnoesen-1",
+      "participantId": "mnoesen",
+      "entryNumber": 1,
+      "startWeek": 1,
+      "status": "alive",
+      "eliminatedWeek": null,
+      "eliminationReason": null,
+      "picks": {
+        "1": "BAL"
       }
     }
   ],
