@@ -230,6 +230,10 @@
     {
       "id": "cgodfrey",
       "name": "C. Godfrey"
+    },
+    {
+      "id": "rhunter",
+      "name": "R. Hunter"
     }
   ],
   "entries": [
@@ -356,6 +360,18 @@
     {
       "id": "cgodfrey-1",
       "participantId": "cgodfrey",
+      "entryNumber": 1,
+      "startWeek": 1,
+      "status": "alive",
+      "eliminatedWeek": null,
+      "eliminationReason": null,
+      "picks": {
+        "1": "LAC"
+      }
+    },
+    {
+      "id": "rhunter-1",
+      "participantId": "rhunter",
       "entryNumber": 1,
       "startWeek": 1,
       "status": "alive",
