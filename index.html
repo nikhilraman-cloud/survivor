@@ -92,6 +92,20 @@
   .badge.open { background: var(--warn-bg); color: var(--warn-ink); }
   .badge.win { background: var(--good-bg); color: var(--good-ink); }
 
+  .picker { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center; }
+  select { font: inherit; padding: 7px 10px; border-radius: 8px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); max-width: 100%; }
+  .mine { margin-top: 14px; }
+  .mine-entry { border-top: 1px solid var(--line); padding: 14px 0 2px; }
+  .mine-entry:first-child { border-top: 0; padding-top: 2px; }
+  .mine-head { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: baseline; }
+  .mine-head .t { font-weight: 650; font-size: 15px; }
+  .sub-label { font-size: 11.5px; color: var(--ink-3); text-transform: uppercase; letter-spacing: .05em; margin: 12px 0 0; }
+  .chip.used-w { background: var(--good-bg); color: var(--good-ink); border-color: transparent; font-weight: 600; }
+  .chip.used-l { background: var(--bad-bg); color: var(--bad-ink); border-color: transparent; font-weight: 600; }
+  .chip.used-p { background: var(--warn-bg); color: var(--warn-ink); border-color: transparent; font-weight: 600; }
+  .chip .wk { opacity: .6; font-weight: 500; margin-right: 4px; }
+  .hint { font-size: 13px; color: var(--ink-2); }
+
   .tablewrap { overflow-x: auto; }
   table.plain { width: 100%; border-collapse: collapse; font-size: 13.5px; }
   table.plain td { white-space: nowrap; }
@@ -145,6 +159,58 @@
     return `${m}m left`;
   }
   function buyIn(L, n) { const s = L.rules.buyInSchedule; return s[Math.min(n, s.length) - 1]; }
+  function isLive(e) { return e.status === 'alive' || e.status === 'winner'; }
+
+  // Teams an entry has burned, and what is left. The current week's pick is
+  // withheld while picks are hidden, so this reads as "available going into
+  // this week" and never leaks a pending pick by omission.
+  function pickBreakdown(L, D, e) {
+    const hist = [];
+    Object.keys(e.picks).map(Number).sort((a, b) => a - b).forEach(w => {
+      if (w === D.cw && !D.showPicks) return;
+      const t = e.picks[String(w)];
+      hist.push({ w, t, res: (L.results[String(w)] || {})[t] });
+    });
+    const used = new Set(hist.map(h => h.t));
+    const remaining = Object.keys(L.teams).sort().filter(t => !used.has(t));
+    return { hist, used, remaining };
+  }
+  function usedChips(L, B) {
+    if (!B.hist.length) return '<span class="hint">None yet.</span>';
+    const word = { W: 'won', L: 'lost', T: 'tie' };
+    return B.hist.map(h => {
+      const cls = h.res === 'W' ? 'used-w' : (h.res === 'L' || h.res === 'T') ? 'used-l' : 'used-p';
+      return `<span class="chip ${cls}" title="Week ${h.w} — ${esc(L.teams[h.t] || h.t)} — ${h.res ? word[h.res] : 'pending'}"><span class="wk">W${h.w}</span>${esc(h.t)}</span>`;
+    }).join('');
+  }
+  function availChips(L, D, B) {
+    const byes = new Set(D.wk.byes || []);
+    return B.remaining.map(t => `<span class="chip ${byes.has(t) ? 'bye' : ''}" title="${esc(L.teams[t] || t)}${byes.has(t) ? ' — on bye this week' : ''}">${esc(t)}</span>`).join('');
+  }
+  function currentLine(L, D, e) {
+    if (L.seasonComplete || !isLive(e)) return '';
+    const pick = e.picks[String(D.cw)];
+    if (!pick) return `Week ${D.cw}: <b>no pick submitted yet</b>${D.wk.lock ? ` — due by ${esc(fmtLock(D.wk.lock))}` : ''}`;
+    return D.showPicks ? `Week ${D.cw}: <b>${esc(pick)}</b>` : `Week ${D.cw}: pick is in — hidden until kickoff`;
+  }
+  function mineHtml(L, D, g) {
+    return g.entries.map(e => {
+      const B = pickBreakdown(L, D, e), live = isLive(e);
+      const badge = e.status === 'winner' ? '<span class="badge win">Winner</span>'
+        : !live ? `<span class="badge out">Out W${e.eliminatedWeek}${e.eliminationReason ? ' · ' + esc(e.eliminationReason) : ''}</span>`
+        : '<span class="badge alive">Alive</span>';
+      const cur = currentLine(L, D, e);
+      return `<div class="mine-entry">
+        <div class="mine-head"><span class="t">${esc(g.p.name)} <span class="muted">#${e.entryNumber}</span></span>${badge}
+          <span class="muted" style="font-size:12.5px">${B.used.size} used${live ? ` · ${B.remaining.length} available` : ''}</span></div>
+        ${cur ? `<div class="hint" style="margin-top:6px">${cur}</div>` : ''}
+        <div class="sub-label">Teams already used</div>
+        <div class="chips">${usedChips(L, B)}</div>
+        ${live ? `<div class="sub-label">Still available${L.seasonComplete ? '' : ` for Week ${D.cw}`}</div>
+        <div class="chips">${availChips(L, D, B)}</div>` : ''}
+      </div>`;
+    }).join('');
+  }
 
   // ---------- derived ----------
   function derive(L) {
@@ -201,6 +267,18 @@
       html.push(`<div class="card banner">No entries yet. The commissioner adds participants and picks each week; this page updates automatically.</div>`);
     }
 
+    // Your picks — personal lookup, remembered per browser
+    if (L.entries.length) {
+      const opts = Object.values(D.byP).sort((a, b) => a.p.name.localeCompare(b.p.name))
+        .map(g => `<option value="${esc(g.p.id)}">${esc(g.p.name)}</option>`).join('');
+      html.push(`<div class="card">
+        <h2>Your picks</h2>
+        <div class="picker"><label for="who" class="hint">Who are you?</label>
+          <select id="who"><option value="">— pick your name —</option>${opts}</select></div>
+        <div class="mine" id="mine-body"></div>
+      </div>`);
+    }
+
     // Standings grid
     const groups = Object.values(D.byP).map(g => ({ ...g, anyAlive: g.entries.some(e => e.status === 'alive' || e.status === 'winner'),
       bestWeek: Math.max(...g.entries.map(e => e.eliminatedWeek == null ? 99 : e.eliminatedWeek)) }))
@@ -222,19 +300,20 @@
       <div class="legend"><span class="l-won">Won</span><span class="l-lost">Lost / tie / no pick</span><span class="l-pending">Pending this week</span><span class="l-locked">Locked until kickoff</span><span class="l-future">Future</span></div>
       </div>`);
 
-    // Alive list + tracker
-    const allTeams = Object.keys(L.teams).sort();
-    const aliveHtml = D.alive.length ? D.alive
-      .sort((a, b) => (D.byP[a.participantId].p.name.localeCompare(D.byP[b.participantId].p.name)) || a.entryNumber - b.entryNumber)
-      .map(e => {
-        const used = new Set(Object.values(e.picks));
-        const remaining = allTeams.filter(t => !used.has(t));
-        const byes = new Set(D.wk.byes || []);
-        const hasPick = !!e.picks[String(D.cw)];
-        return `<details><summary><span class="name">${esc(D.byP[e.participantId].p.name)} <span class="muted">#${e.entryNumber}</span></span>
-          <span class="meta">${used.size} used · ${remaining.length} left${L.seasonComplete ? '' : hasPick ? ' · pick in' : ' · <b>no pick yet</b>'}</span></summary>
-          <div class="chips">${remaining.map(t => `<span class="chip ${byes.has(t) ? 'bye' : ''}" title="${esc(L.teams[t])}${byes.has(t) ? ' — bye this week' : ''}">${t}</span>`).join('')}</div></details>`;
-      }).join('') : `<div class="empty">Nobody is alive.</div>`;
+    // Everyone's used + available teams
+    const roster = [...L.entries].sort((a, b) => (isLive(b) - isLive(a))
+      || D.byP[a.participantId].p.name.localeCompare(D.byP[b.participantId].p.name)
+      || a.entryNumber - b.entryNumber);
+    const rosterHtml = roster.length ? roster.map(e => {
+      const B = pickBreakdown(L, D, e), live = isLive(e);
+      const hasPick = !!e.picks[String(D.cw)];
+      const meta = !live ? `out W${e.eliminatedWeek} · ${B.used.size} used`
+        : `${B.used.size} used · ${B.remaining.length} available${L.seasonComplete ? '' : hasPick ? ' · pick in' : ' · <b>no pick yet</b>'}`;
+      return `<details><summary><span class="name">${esc(D.byP[e.participantId].p.name)} <span class="muted">#${e.entryNumber}</span></span>
+        <span class="meta">${meta}</span></summary>
+        <div class="sub-label">Used</div><div class="chips">${usedChips(L, B)}</div>
+        ${live ? `<div class="sub-label">Available</div><div class="chips">${availChips(L, D, B)}</div>` : ''}</details>`;
+    }).join('') : `<div class="empty">No entries.</div>`;
 
     const trackerRows = Object.values(D.byP).sort((a, b) => a.p.name.localeCompare(b.p.name)).map(g => {
       const n = g.entries.length, max = L.rules.maxEntriesPerPerson;
@@ -251,7 +330,7 @@
     }).join('');
 
     html.push(`<div class="two">
-      <div class="card"><h2>Still alive · remaining teams</h2>${aliveHtml}</div>
+      <div class="card"><h2>Teams used &amp; available</h2>${rosterHtml}</div>
       <div class="card"><h2>Entries &amp; rebuys</h2>
         <div class="tablewrap"><table class="plain"><thead><tr><th>Person</th><th class="num">Entries</th><th>Buy-ins</th><th>Next rebuy</th></tr></thead>
         <tbody>${trackerRows || `<tr><td colspan="4" class="empty">No participants yet.</td></tr>`}</tbody></table></div>
@@ -285,6 +364,21 @@
     html.push(`<footer>Commissioner: Nikhil. Questions or corrections — send him a note. Data updates within a minute of a change.</footer>`);
     app.innerHTML = html.join('');
     document.title = `${L.leagueName} — Week ${D.cw}`;
+
+    const sel = document.getElementById('who'), body = document.getElementById('mine-body');
+    if (sel && body) {
+      let saved = '';
+      try { saved = localStorage.getItem('survivor-who') || ''; } catch (_) {}
+      if (saved && D.byP[saved]) sel.value = saved;
+      const paint = () => {
+        const id = sel.value;
+        try { id ? localStorage.setItem('survivor-who', id) : localStorage.removeItem('survivor-who'); } catch (_) {}
+        body.innerHTML = (id && D.byP[id]) ? mineHtml(L, D, D.byP[id])
+          : `<div class="hint">Pick your name to see the teams you have already used and the ones you still have left.</div>`;
+      };
+      sel.addEventListener('change', paint);
+      paint();
+    }
   }
 })();
 </script>
