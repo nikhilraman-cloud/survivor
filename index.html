@@ -267,6 +267,11 @@
       html.push(`<div class="card banner">No entries yet. The commissioner adds participants and picks each week; this page updates automatically.</div>`);
     }
 
+    // Picks revealed before the deadline — say why, or it looks like a leak
+    if (D.showPicks && !D.locked && !L.seasonComplete && L.entries.length) {
+      html.push(`<div class="card banner"><b>Week ${D.cw} picks are final.</b> Every entry submitted ahead of the deadline, so the commissioner closed the week early and revealed the picks. No changes are accepted for Week ${D.cw}${D.wk.lock ? `; games kick off ${esc(fmtLock(D.wk.lock))}` : ''}.</div>`);
+    }
+
     // Your picks — personal lookup, remembered per browser
     if (L.entries.length) {
       const opts = Object.values(D.byP).sort((a, b) => a.p.name.localeCompare(b.p.name))
@@ -355,7 +360,7 @@
         <li>A team can be used <b>once per entry</b> across the season.</li>
         <li>Buy-ins per person, in order: ${L.rules.buyInSchedule.map(money).join(' → ')}. Max ${L.rules.maxEntriesPerPerson} entries per person.</li>
         <li>${esc(L.rules.rebuyText)}</li>
-        <li>Picks lock at the first kickoff of the week (${D.wk.lock ? 'this week: ' + esc(fmtLock(D.wk.lock)) : 'usually Thursday night'}) and are hidden until then.</li>
+        <li>Picks lock at the first kickoff of the week${D.wk.lock ? ` (this week: ${esc(fmtLock(D.wk.lock))})` : ''} and stay hidden until then${D.showPicks && !D.locked && !L.seasonComplete ? ` — unless every entry is in and the commissioner closes the week early, which is what happened in Week ${D.cw}` : ''}.</li>
         <li>Pot = all buy-ins. ${esc(L.rules.payoutText)}</li>
       </ol>
       <details style="margin-top:10px;border-top:0"><summary><span class="name muted">Bye weeks</span><span class="meta">show</span></summary><div class="byes">${byeList || '<span class="empty">none listed</span>'}</div></details>
