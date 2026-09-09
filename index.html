@@ -104,12 +104,15 @@
   .chip.used-l { background: var(--bad-bg); color: var(--bad-ink); border-color: transparent; font-weight: 600; }
   .chip.used-p { background: var(--warn-bg); color: var(--warn-ink); border-color: transparent; font-weight: 600; }
   .chip .wk { opacity: .6; font-weight: 500; margin-right: 4px; }
-  /* Team identity rides on a left edge so the fill can keep meaning won/lost. */
-  .chip[style*="--team"] { border-left-width: 3px; border-left-color: var(--team); padding-left: 6px; }
-  .cell[style*="--team"] { border-left: 3px solid var(--team); }
+  /* A team's two colors bracket the abbreviation, so the fill can keep meaning
+     won/lost and identity stays on the edges. */
+  .chip[style*="--t1"] { border-left-width: 3px; border-right-width: 3px; padding: 2px 5px;
+    border-left-color: var(--t1); border-right-color: var(--t2); }
+  .cell[style*="--t1"] { border-left: 3px solid var(--t1); border-right: 3px solid var(--t2); }
   @media (prefers-color-scheme: dark) {
-    .chip[style*="--team"] { border-left-color: color-mix(in oklab, var(--team) 72%, white); }
-    .cell[style*="--team"] { border-left-color: color-mix(in oklab, var(--team) 72%, white); }
+    .chip[style*="--t1"], .cell[style*="--t1"] {
+      border-left-color: color-mix(in oklab, var(--t1) 72%, white);
+      border-right-color: color-mix(in oklab, var(--t2) 72%, white); }
   }
   .hint { font-size: 13px; color: var(--ink-2); }
 
@@ -174,17 +177,29 @@
   // distinguishable colors, so a couple of pairs collide (Falcons/Texans red,
   // Bengals/Broncos orange); the three letters remain the identity.
   function teamStyle(t) {
+    // [primary, secondary] per team. Pure black and pure white are never used —
+    // they vanish against one surface or the other — so those slots take a dark
+    // charcoal or a mid grey instead. No two teams share a pair, so the bracket
+    // identifies a team even before you read the letters.
     const C = {
-      ARI: '#97233F', ATL: '#A71930', BAL: '#241773', BUF: '#00338D',
-      CAR: '#0085CA', CHI: '#C83803', CIN: '#FB4F14', CLE: '#FF3C00',
-      DAL: '#869397', DEN: '#FA4616', DET: '#0076B6', GB:  '#204E32',
-      HOU: '#A71930', IND: '#002C5F', JAX: '#006778', KC:  '#E31837',
-      LAC: '#0080C6', LAR: '#003594', LV:  '#A5ACAF', MIA: '#008E97',
-      MIN: '#4F2683', NE:  '#C60C30', NO:  '#D3BC8D', NYG: '#0B2265',
-      NYJ: '#125740', PHI: '#004C54', PIT: '#FFB612', SEA: '#69BE28',
-      SF:  '#AA0000', TB:  '#D50A0A', TEN: '#4B92DB', WAS: '#5A1414',
+      ARI: ['#97233F', '#FFB612'], ATL: ['#A71930', '#A5ACAF'],
+      BAL: ['#241773', '#9E7C0C'], BUF: ['#00338D', '#C60C30'],
+      CAR: ['#0085CA', '#BFC0BF'], CHI: ['#0B162A', '#C83803'],
+      CIN: ['#FB4F14', '#101820'], CLE: ['#311D00', '#FF3C00'],
+      DAL: ['#041E42', '#869397'], DEN: ['#FA4616', '#002244'],
+      DET: ['#0076B6', '#B0B7BC'], GB:  ['#203731', '#FFB612'],
+      HOU: ['#03202F', '#A71930'], IND: ['#002C5F', '#9BA3A0'],
+      JAX: ['#006778', '#D7A22A'], KC:  ['#E31837', '#FFB81C'],
+      LAC: ['#0080C6', '#FFC20E'], LAR: ['#003594', '#FFA300'],
+      LV:  ['#101820', '#A5ACAF'], MIA: ['#008E97', '#FC4C02'],
+      MIN: ['#4F2683', '#FFC62F'], NE:  ['#002244', '#C60C30'],
+      NO:  ['#101820', '#D3BC8D'], NYG: ['#0B2265', '#A71930'],
+      NYJ: ['#125740', '#9BA3A0'], PHI: ['#004C54', '#A5ACAF'],
+      PIT: ['#FFB612', '#101820'], SEA: ['#002244', '#69BE28'],
+      SF:  ['#AA0000', '#B3995D'], TB:  ['#D50A0A', '#B1BABF'],
+      TEN: ['#0C2340', '#4B92DB'], WAS: ['#5A1414', '#FFB612'],
     };
-    return C[t] ? ` style="--team:${C[t]}"` : '';
+    return C[t] ? ` style="--t1:${C[t][0]};--t2:${C[t][1]}"` : '';
   }
 
   // Teams an entry has burned, and what is left. The current week's pick is
@@ -328,7 +343,7 @@
     html.push(`<div class="card"><h2>Standings</h2>
       <div class="gridwrap"><table class="grid"><thead><tr><th>Entry</th>${weeksN.map(w => `<th class="${w === D.cw ? 'cur' : ''}">W${w}</th>`).join('')}</tr></thead>
       <tbody>${rows || `<tr><td colspan="${weeksN.length + 1}" class="empty" style="text-align:left">No entries.</td></tr>`}</tbody></table></div>
-      <div class="legend"><span class="l-won">Won</span><span class="l-lost">Lost / tie / no pick</span><span class="l-pending">Pending this week</span><span class="l-locked">Locked until kickoff</span><span class="l-future">Future</span><span class="muted">Left edge = team color</span></div>
+      <div class="legend"><span class="l-won">Won</span><span class="l-lost">Lost / tie / no pick</span><span class="l-pending">Pending this week</span><span class="l-locked">Locked until kickoff</span><span class="l-future">Future</span><span class="muted">Colored edges = team colors</span></div>
       </div>`);
 
     // Everyone's used + available teams
