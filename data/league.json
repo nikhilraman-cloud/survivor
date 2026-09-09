@@ -238,6 +238,10 @@
     {
       "id": "mnoesen",
       "name": "M. Noesen"
+    },
+    {
+      "id": "jcopeland",
+      "name": "J. Copeland"
     }
   ],
   "entries": [
@@ -395,6 +399,18 @@
       "eliminationReason": null,
       "picks": {
         "1": "BAL"
+      }
+    },
+    {
+      "id": "jcopeland-1",
+      "participantId": "jcopeland",
+      "entryNumber": 1,
+      "startWeek": 1,
+      "status": "alive",
+      "eliminatedWeek": null,
+      "eliminationReason": null,
+      "picks": {
+        "1": "LAC"
       }
     }
   ],
