@@ -222,6 +222,10 @@
     {
       "id": "jwender",
       "name": "J. Wender"
+    },
+    {
+      "id": "agodfrey",
+      "name": "A. Godfrey"
     }
   ],
   "entries": [
@@ -331,6 +335,18 @@
       "eliminationReason": null,
       "picks": {
         "1": "JAX"
+      }
+    },
+    {
+      "id": "agodfrey-1",
+      "participantId": "agodfrey",
+      "entryNumber": 1,
+      "startWeek": 1,
+      "status": "alive",
+      "eliminatedWeek": null,
+      "eliminationReason": null,
+      "picks": {
+        "1": "LAC"
       }
     }
   ],
