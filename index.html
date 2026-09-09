@@ -104,6 +104,13 @@
   .chip.used-l { background: var(--bad-bg); color: var(--bad-ink); border-color: transparent; font-weight: 600; }
   .chip.used-p { background: var(--warn-bg); color: var(--warn-ink); border-color: transparent; font-weight: 600; }
   .chip .wk { opacity: .6; font-weight: 500; margin-right: 4px; }
+  /* Team identity rides on a left edge so the fill can keep meaning won/lost. */
+  .chip[style*="--team"] { border-left-width: 3px; border-left-color: var(--team); padding-left: 6px; }
+  .cell[style*="--team"] { border-left: 3px solid var(--team); }
+  @media (prefers-color-scheme: dark) {
+    .chip[style*="--team"] { border-left-color: color-mix(in oklab, var(--team) 72%, white); }
+    .cell[style*="--team"] { border-left-color: color-mix(in oklab, var(--team) 72%, white); }
+  }
   .hint { font-size: 13px; color: var(--ink-2); }
 
   .tablewrap { overflow-x: auto; }
@@ -161,6 +168,25 @@
   function buyIn(L, n) { const s = L.rules.buyInSchedule; return s[Math.min(n, s.length) - 1]; }
   function isLive(e) { return e.status === 'alive' || e.status === 'winner'; }
 
+  // Team accent colors. Each team's most recognizable color that still reads as a
+  // 3px stripe on both surfaces — a few near-black primaries (Raiders, Saints,
+  // Bears, Browns) use the iconic secondary instead. 32 teams cannot have 32
+  // distinguishable colors, so a couple of pairs collide (Falcons/Texans red,
+  // Bengals/Broncos orange); the three letters remain the identity.
+  function teamStyle(t) {
+    const C = {
+      ARI: '#97233F', ATL: '#A71930', BAL: '#241773', BUF: '#00338D',
+      CAR: '#0085CA', CHI: '#C83803', CIN: '#FB4F14', CLE: '#FF3C00',
+      DAL: '#869397', DEN: '#FA4616', DET: '#0076B6', GB:  '#204E32',
+      HOU: '#A71930', IND: '#002C5F', JAX: '#006778', KC:  '#E31837',
+      LAC: '#0080C6', LAR: '#003594', LV:  '#A5ACAF', MIA: '#008E97',
+      MIN: '#4F2683', NE:  '#C60C30', NO:  '#D3BC8D', NYG: '#0B2265',
+      NYJ: '#125740', PHI: '#004C54', PIT: '#FFB612', SEA: '#69BE28',
+      SF:  '#AA0000', TB:  '#D50A0A', TEN: '#4B92DB', WAS: '#5A1414',
+    };
+    return C[t] ? ` style="--team:${C[t]}"` : '';
+  }
+
   // Teams an entry has burned, and what is left. The current week's pick is
   // withheld while picks are hidden, so this reads as "available going into
   // this week" and never leaks a pending pick by omission.
@@ -180,12 +206,12 @@
     const word = { W: 'won', L: 'lost', T: 'tie' };
     return B.hist.map(h => {
       const cls = h.res === 'W' ? 'used-w' : (h.res === 'L' || h.res === 'T') ? 'used-l' : 'used-p';
-      return `<span class="chip ${cls}" title="Week ${h.w} — ${esc(L.teams[h.t] || h.t)} — ${h.res ? word[h.res] : 'pending'}"><span class="wk">W${h.w}</span>${esc(h.t)}</span>`;
+      return `<span class="chip ${cls}"${teamStyle(h.t)} title="Week ${h.w} — ${esc(L.teams[h.t] || h.t)} — ${h.res ? word[h.res] : 'pending'}"><span class="wk">W${h.w}</span>${esc(h.t)}</span>`;
     }).join('');
   }
   function availChips(L, D, B) {
     const byes = new Set(D.wk.byes || []);
-    return B.remaining.map(t => `<span class="chip ${byes.has(t) ? 'bye' : ''}" title="${esc(L.teams[t] || t)}${byes.has(t) ? ' — on bye this week' : ''}">${esc(t)}</span>`).join('');
+    return B.remaining.map(t => `<span class="chip ${byes.has(t) ? 'bye' : ''}"${teamStyle(t)} title="${esc(L.teams[t] || t)}${byes.has(t) ? ' — on bye this week' : ''}">${esc(t)}</span>`).join('');
   }
   function currentLine(L, D, e) {
     if (L.seasonComplete || !isLive(e)) return '';
@@ -295,14 +321,14 @@
         const out = !(e.status === 'alive' || e.status === 'winner');
         const st = e.status === 'winner' ? 'Winner' : out ? `Out W${e.eliminatedWeek}${e.eliminationReason ? ' · ' + e.eliminationReason : ''}` : 'Alive';
         rows += `<tr class="${out ? 'out' : ''} ${i === 0 ? 'group-start' : ''}"><td><span class="who">${esc(g.p.name)}<small>#${e.entryNumber}</small></span><span class="status">${esc(st)}</span></td>`;
-        weeksN.forEach(w => { const c = cellFor(L, D, e, w); rows += `<td><div class="cell ${c.cls}" title="Week ${w}${c.main ? ': ' + esc(c.main) : ''}">${esc(c.main)}${c.sub ? `<small>${esc(c.sub)}</small>` : ''}</div></td>`; });
+        weeksN.forEach(w => { const c = cellFor(L, D, e, w); rows += `<td><div class="cell ${c.cls}"${teamStyle(c.main)} title="Week ${w}${c.main ? ': ' + esc(c.main) : ''}">${esc(c.main)}${c.sub ? `<small>${esc(c.sub)}</small>` : ''}</div></td>`; });
         rows += '</tr>';
       });
     });
     html.push(`<div class="card"><h2>Standings</h2>
       <div class="gridwrap"><table class="grid"><thead><tr><th>Entry</th>${weeksN.map(w => `<th class="${w === D.cw ? 'cur' : ''}">W${w}</th>`).join('')}</tr></thead>
       <tbody>${rows || `<tr><td colspan="${weeksN.length + 1}" class="empty" style="text-align:left">No entries.</td></tr>`}</tbody></table></div>
-      <div class="legend"><span class="l-won">Won</span><span class="l-lost">Lost / tie / no pick</span><span class="l-pending">Pending this week</span><span class="l-locked">Locked until kickoff</span><span class="l-future">Future</span></div>
+      <div class="legend"><span class="l-won">Won</span><span class="l-lost">Lost / tie / no pick</span><span class="l-pending">Pending this week</span><span class="l-locked">Locked until kickoff</span><span class="l-future">Future</span><span class="muted">Left edge = team color</span></div>
       </div>`);
 
     // Everyone's used + available teams
