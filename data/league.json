@@ -2,7 +2,7 @@
   "leagueName": "Office Survivor 2026",
   "season": 2026,
   "currentWeek": 1,
-  "showCurrentWeekPicks": false,
+  "showCurrentWeekPicks": true,
   "seasonComplete": false,
   "lastUpdated": "2026-09-09",
   "rules": {
@@ -23,7 +23,7 @@
     "1": {
       "lock": "2026-09-09T20:20:00-04:00",
       "byes": [],
-      "note": "Season opener is Wednesday Sept 9 (NE at SEA, 8:20 PM ET)"
+      "note": "Season opener Wed Sept 9, 8:20 PM ET (NE at SEA). All 13 picks were submitted and declared final by the commissioner on the afternoon of Sept 9 \u2014 picks revealed early, no changes accepted."
     },
     "2": {
       "lock": "2026-09-17T20:15:00-04:00",
