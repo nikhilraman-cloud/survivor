@@ -14,8 +14,15 @@ Static GitHub Pages dashboard for an office NFL survivor league. One commissione
 | `data/league.json` | **Public** league state: rules, week lock times and byes, teams, participants, entries, picks, results, payouts. No payment data. |
 | `data/sample.json` | Fake Weeks 1–5 data covering an elimination, a rebuy, a tie, a missed pick, and an open rebuy window. Safe to delete once the season is running. |
 | `validate.js` | Integrity checks. Run before every commit: `node validate.js` (add `--ledger <path>` to cross-check the private ledger). |
+| `weekly-email.js` | Generates the Tuesday recap email as paste-ready HTML. Writes to `..\out\week-N-recap.html` — outside the published folder. |
 
 **Private ledger (not in this repo):** `%OneDriveCommercial%\Claude\survivor\ledger.json` holds who has paid, how, and when, plus payout disbursement status and contact handles. The public page only shows the pot total (derived from entry count × buy-in schedule) and a note that payment is tracked offline.
+
+## What players see
+
+The dashboard has a **Your picks** panel at the top: pick your name from the dropdown and it shows, per entry, the teams you have already used (week-labelled, green if the pick won, red if it lost or tied) and the teams you still have available. The browser remembers your name, so it is one tap on a return visit. **Teams used & available** lower down shows the same thing for everyone, collapsed.
+
+A submitted pick for the current week is never named before kickoff — the panel says "pick is in — hidden until kickoff" and that team stays in your available list, so nobody can work out a pending pick by comparing lists.
 
 ## Rules encoded
 
@@ -80,6 +87,15 @@ Cowork adds `jones-2` (`startWeek` = current week, `entryNumber` = 2) to the pub
 
 > Jones paid $50 Venmo
 
+**Tuesday, after results — the recap email.** Cowork runs `weekly-email.js` and hands you the HTML file plus a subject line. Open it, select all, copy, paste into Outlook. It contains: pot and alive count, who was eliminated this week and how, any open rebuy windows with amounts and the deadline, a **teams-already-used table for every live entry** (the reference people ask for), the entries knocked out in earlier weeks, and a link to the dashboard.
+
+```powershell
+node site\weekly-email.js                 # recaps currentWeek - 1
+node site\weekly-email.js --week 3        # a specific week
+```
+
+It refuses to run before any week has been played. Regenerating overwrites that week's file, so fixing a result and re-running is safe.
+
 **Season end.**
 
 > Close out the season
@@ -98,6 +114,7 @@ Cowork sets `seasonComplete`, marks winner(s), writes `payouts` (equal split of 
 | `Jones rebuys` | New entry at next buy-in tier if eligible |
 | `Jones paid $50 Venmo` | Ledger update only |
 | `Who owes money?` | Unpaid rows from the ledger |
+| `Send the weekly email` | Generate `week-N-recap.html` + subject line, ready to paste into Outlook |
 | `Close out the season` | Winners, payouts, disbursement checklist |
 | `Fix: Week 2 Smith-1 should be KC, not PHI` | Edit + re-validate + push (git history keeps the audit trail) |
 
