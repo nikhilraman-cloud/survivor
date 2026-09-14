@@ -1,10 +1,10 @@
 {
   "leagueName": "Office Survivor 2026",
   "season": 2026,
-  "currentWeek": 1,
-  "showCurrentWeekPicks": true,
+  "currentWeek": 2,
+  "showCurrentWeekPicks": false,
   "seasonComplete": false,
-  "lastUpdated": "2026-09-09",
+  "lastUpdated": "2026-09-14",
   "rules": {
     "payout": "winner-take-all",
     "payoutText": "Last surviving entry wins the full pot. If multiple entries survive Week 18, they split it equally. If every remaining entry is eliminated in the same week, those entries split the pot.",
@@ -250,9 +250,9 @@
       "participantId": "nosher",
       "entryNumber": 1,
       "startWeek": 1,
-      "status": "alive",
-      "eliminatedWeek": null,
-      "eliminationReason": null,
+      "status": "eliminated",
+      "eliminatedWeek": 1,
+      "eliminationReason": "loss",
       "picks": {
         "1": "LAC"
       }
@@ -286,9 +286,9 @@
       "participantId": "hweiss",
       "entryNumber": 1,
       "startWeek": 1,
-      "status": "alive",
-      "eliminatedWeek": null,
-      "eliminationReason": null,
+      "status": "eliminated",
+      "eliminatedWeek": 1,
+      "eliminationReason": "loss",
       "picks": {
         "1": "LAC"
       }
@@ -298,9 +298,9 @@
       "participantId": "nweiss",
       "entryNumber": 1,
       "startWeek": 1,
-      "status": "alive",
-      "eliminatedWeek": null,
-      "eliminationReason": null,
+      "status": "eliminated",
+      "eliminatedWeek": 1,
+      "eliminationReason": "loss",
       "picks": {
         "1": "LAC"
       }
@@ -310,9 +310,9 @@
       "participantId": "rjahn",
       "entryNumber": 1,
       "startWeek": 1,
-      "status": "alive",
-      "eliminatedWeek": null,
-      "eliminationReason": null,
+      "status": "eliminated",
+      "eliminatedWeek": 1,
+      "eliminationReason": "loss",
       "picks": {
         "1": "LAC"
       }
@@ -322,9 +322,9 @@
       "participantId": "btucker",
       "entryNumber": 1,
       "startWeek": 1,
-      "status": "alive",
-      "eliminatedWeek": null,
-      "eliminationReason": null,
+      "status": "eliminated",
+      "eliminatedWeek": 1,
+      "eliminationReason": "loss",
       "picks": {
         "1": "LAC"
       }
@@ -334,9 +334,9 @@
       "participantId": "cnobili",
       "entryNumber": 1,
       "startWeek": 1,
-      "status": "alive",
-      "eliminatedWeek": null,
-      "eliminationReason": null,
+      "status": "eliminated",
+      "eliminatedWeek": 1,
+      "eliminationReason": "loss",
       "picks": {
         "1": "LAC"
       }
@@ -358,9 +358,9 @@
       "participantId": "agodfrey",
       "entryNumber": 1,
       "startWeek": 1,
-      "status": "alive",
-      "eliminatedWeek": null,
-      "eliminationReason": null,
+      "status": "eliminated",
+      "eliminatedWeek": 1,
+      "eliminationReason": "loss",
       "picks": {
         "1": "LAC"
       }
@@ -370,9 +370,9 @@
       "participantId": "cgodfrey",
       "entryNumber": 1,
       "startWeek": 1,
-      "status": "alive",
-      "eliminatedWeek": null,
-      "eliminationReason": null,
+      "status": "eliminated",
+      "eliminatedWeek": 1,
+      "eliminationReason": "loss",
       "picks": {
         "1": "LAC"
       }
@@ -382,9 +382,9 @@
       "participantId": "rhunter",
       "entryNumber": 1,
       "startWeek": 1,
-      "status": "alive",
-      "eliminatedWeek": null,
-      "eliminationReason": null,
+      "status": "eliminated",
+      "eliminatedWeek": 1,
+      "eliminationReason": "loss",
       "picks": {
         "1": "LAC"
       }
@@ -406,14 +406,20 @@
       "participantId": "jcopeland",
       "entryNumber": 1,
       "startWeek": 1,
-      "status": "alive",
-      "eliminatedWeek": null,
-      "eliminationReason": null,
+      "status": "eliminated",
+      "eliminatedWeek": 1,
+      "eliminationReason": "loss",
       "picks": {
         "1": "LAC"
       }
     }
   ],
-  "results": {},
+  "results": {
+    "1": {
+      "LAC": "L",
+      "JAX": "W",
+      "BAL": "W"
+    }
+  },
   "payouts": []
 }
