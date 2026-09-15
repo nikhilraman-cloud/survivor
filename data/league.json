@@ -266,7 +266,8 @@
       "eliminatedWeek": null,
       "eliminationReason": null,
       "picks": {
-        "1": "JAX"
+        "1": "JAX",
+        "2": "TB"
       }
     },
     {
@@ -412,6 +413,18 @@
       "eliminationReason": "loss",
       "picks": {
         "1": "LAC"
+      }
+    },
+    {
+      "id": "nosher-2",
+      "participantId": "nosher",
+      "entryNumber": 2,
+      "startWeek": 2,
+      "status": "alive",
+      "eliminatedWeek": null,
+      "eliminationReason": null,
+      "picks": {
+        "2": "SF"
       }
     }
   ],
