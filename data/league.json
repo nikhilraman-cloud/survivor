@@ -1,7 +1,7 @@
 {
   "leagueName": "Office Survivor 2026",
   "season": 2026,
-  "currentWeek": 2,
+  "currentWeek": 3,
   "showCurrentWeekPicks": false,
   "seasonComplete": false,
   "lastUpdated": "2026-09-21",
@@ -262,9 +262,9 @@
       "participantId": "dsoble",
       "entryNumber": 1,
       "startWeek": 1,
-      "status": "alive",
-      "eliminatedWeek": null,
-      "eliminationReason": null,
+      "status": "eliminated",
+      "eliminatedWeek": 2,
+      "eliminationReason": "loss",
       "picks": {
         "1": "JAX",
         "2": "TB"
@@ -275,9 +275,9 @@
       "participantId": "nraman",
       "entryNumber": 1,
       "startWeek": 1,
-      "status": "alive",
-      "eliminatedWeek": null,
-      "eliminationReason": null,
+      "status": "eliminated",
+      "eliminatedWeek": 2,
+      "eliminationReason": "loss",
       "picks": {
         "1": "JAX",
         "2": "TB"
@@ -483,6 +483,11 @@
       "LAC": "L",
       "JAX": "W",
       "BAL": "W"
+    },
+    "2": {
+      "TB": "L",
+      "SF": "W",
+      "PHI": "W"
     }
   },
   "payouts": []
