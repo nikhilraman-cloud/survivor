@@ -477,7 +477,20 @@
       "eliminatedWeek": null,
       "eliminationReason": null,
       "picks": {
-        "2": "SF"
+        "2": "SF",
+        "3": "KC"
+      }
+    },
+    {
+      "id": "nraman-2",
+      "participantId": "nraman",
+      "entryNumber": 2,
+      "startWeek": 3,
+      "status": "alive",
+      "eliminatedWeek": null,
+      "eliminationReason": null,
+      "picks": {
+        "3": "KC"
       }
     }
   ],
