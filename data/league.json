@@ -1,10 +1,10 @@
 {
   "leagueName": "Office Survivor 2026",
   "season": 2026,
-  "currentWeek": 3,
+  "currentWeek": 4,
   "showCurrentWeekPicks": false,
   "seasonComplete": false,
-  "lastUpdated": "2026-09-24",
+  "lastUpdated": "2026-09-28",
   "rules": {
     "payout": "winner-take-all",
     "payoutText": "Last surviving entry wins the full pot. If multiple entries survive Week 18, they split it equally. If every remaining entry is eliminated in the same week, those entries split the pot.",
@@ -398,9 +398,9 @@
       "participantId": "mnoesen",
       "entryNumber": 1,
       "startWeek": 1,
-      "status": "alive",
-      "eliminatedWeek": null,
-      "eliminationReason": null,
+      "status": "eliminated",
+      "eliminatedWeek": 3,
+      "eliminationReason": "loss",
       "picks": {
         "1": "BAL",
         "2": "PHI",
@@ -507,6 +507,11 @@
       "TB": "L",
       "SF": "W",
       "PHI": "W"
+    },
+    "3": {
+      "KC": "W",
+      "SEA": "L",
+      "DET": "W"
     }
   },
   "payouts": []
