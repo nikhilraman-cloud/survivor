@@ -20,7 +20,7 @@ Static GitHub Pages dashboard for an office NFL survivor league. One commissione
 
 ## What players see
 
-The dashboard has a **Your picks** panel at the top: pick your name from the dropdown and it shows, per entry, the teams you have already used (week-labelled, green if the pick won, red if it lost or tied) and the teams you still have available. The browser remembers your name, so it is one tap on a return visit. **Teams used & available** lower down shows the same thing for everyone, collapsed.
+The dashboard has a **Your picks** panel at the top: pick your name from the dropdown and it shows, per entry, the teams you have already used across all of your entries (week-labelled, green if the pick won, red if it lost or tied) and the teams you still have available. The browser remembers your name, so it is one tap on a return visit. **Teams used & available** lower down shows the same thing for everyone, collapsed.
 
 Team abbreviations are **bracketed by that team's two colors** — primary on the left edge, secondary on the right — in the standings cells and on every chip, so you can scan the grid without reading each code. The cell fill still means won / lost / pending; identity lives on the edges so the two never fight. All 32 pairs are distinct, so the bracket identifies a team on its own. Pure black and pure white are never used (they vanish against one surface or the other) — those slots take a dark charcoal or a mid grey — and in dark mode both edges are lifted via `color-mix` so dark navies stay visible.
 
@@ -30,7 +30,7 @@ A submitted pick for the current week is never named before kickoff — the pane
 
 - 18 regular-season weeks. Each live entry picks one team to win outright.
 - Loss = eliminated. Tie = eliminated. Missed pick = eliminated.
-- A team can be used once per entry across the season.
+- A team can be used once per person across the season — a team picked on entry #1 is gone for entry #2 and #3 as well.
 - Buy-ins per person, sequential: $20 → $50 → $100. Max 3 entries per person.
 - Rebuy only after the prior entry is eliminated, and only before the next week's first kickoff (i.e., the new entry's `startWeek` must equal the prior entry's `eliminatedWeek + 1`). No delayed rebuys — the validator enforces this.
 - Pot = all buy-ins. Winner-take-all; equal split if multiple entries survive Week 18 or if all remaining entries die in the same week.
@@ -69,7 +69,7 @@ Conventions: entry id = `<participantId>-<entryNumber>`. Buy-in is derived from 
 
 > Week 3 picks: Smith-1 PHI, Jones-2 BUF, Lee-1 DET
 
-Cowork validates each pick (entry is alive, team not already used by that entry, team is not on bye), writes to `league.json`, runs `validate.js`, commits and pushes, and replies with the list of alive entries still missing a pick.
+Cowork validates each pick (entry is alive, team not already used by that person on any entry, team is not on bye), writes to `league.json`, runs `validate.js`, commits and pushes, and replies with the list of alive entries still missing a pick.
 
 **Kickoff (usually Thursday night).** Cowork flips `showCurrentWeekPicks` to true and pushes. Post the dashboard link to Teams. (If you forget, the page unhides itself after the lock time anyway.)
 
