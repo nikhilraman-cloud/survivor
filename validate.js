@@ -54,12 +54,9 @@ const byP = {};
   if (e.paid != null || e.paidDate || e.paidMethod) err(`${e.id}: payment fields belong in the private ledger, not the public file`);
 
   const picks = e.picks || {};
-  const used = {};
   Object.entries(picks).forEach(([w, t]) => {
     const wn = Number(w);
     if (!teams.has(t)) err(`${e.id}: week ${w} pick ${t} is not a team`);
-    if (used[t]) err(`${e.id}: ${t} used twice (weeks ${used[t]} and ${w})`);
-    used[t] = w;
     if (wn < e.startWeek) err(`${e.id}: pick in week ${w} before startWeek ${e.startWeek}`);
     if (e.eliminatedWeek != null && wn > e.eliminatedWeek) err(`${e.id}: pick in week ${w} after elimination in week ${e.eliminatedWeek}`);
     if (wn > L.currentWeek) err(`${e.id}: pick recorded for future week ${w} (currentWeek ${L.currentWeek})`);
@@ -106,6 +103,13 @@ Object.entries(byP).forEach(([pid, list]) => {
   });
   const alive = list.filter(e => e.status === 'alive' || e.status === 'winner');
   if (alive.length > 1) err(`${pid}: more than one live entry at once`);
+  // Used-once is per PERSON: a team picked on any of their entries (including
+  // an eliminated one) cannot be picked again on a later entry.
+  const usedBy = {};
+  list.forEach(e => Object.entries(e.picks || {}).forEach(([w, t]) => {
+    if (usedBy[t]) err(`${pid}: ${t} used twice (${usedBy[t]} and ${e.id} week ${w}) — one team per person for the season`);
+    usedBy[t] = `${e.id} week ${w}`;
+  }));
 });
 
 // --- results ---
