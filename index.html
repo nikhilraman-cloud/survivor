@@ -202,16 +202,21 @@
     return C[t] ? ` style="--t1:${C[t][0]};--t2:${C[t][1]}"` : '';
   }
 
-  // Teams an entry has burned, and what is left. The current week's pick is
-  // withheld while picks are hidden, so this reads as "available going into
-  // this week" and never leaks a pending pick by omission.
+  // Teams a PERSON has burned across all of their entries, and what is left.
+  // The used-once rule is per person, not per entry: a team picked on entry #1
+  // is gone for entry #2 as well. The current week's pick is withheld while
+  // picks are hidden, so this reads as "available going into this week" and
+  // never leaks a pending pick by omission.
   function pickBreakdown(L, D, e) {
     const hist = [];
-    Object.keys(e.picks).map(Number).sort((a, b) => a - b).forEach(w => {
-      if (w === D.cw && !D.showPicks) return;
-      const t = e.picks[String(w)];
-      hist.push({ w, t, res: (L.results[String(w)] || {})[t] });
+    L.entries.filter(x => x.participantId === e.participantId).forEach(x => {
+      Object.keys(x.picks).map(Number).forEach(w => {
+        if (w === D.cw && !D.showPicks) return;
+        const t = x.picks[String(w)];
+        hist.push({ w, t, n: x.entryNumber, res: (L.results[String(w)] || {})[t] });
+      });
     });
+    hist.sort((a, b) => a.w - b.w || a.n - b.n);
     const used = new Set(hist.map(h => h.t));
     const remaining = Object.keys(L.teams).sort().filter(t => !used.has(t));
     return { hist, used, remaining };
@@ -221,7 +226,7 @@
     const word = { W: 'won', L: 'lost', T: 'tie' };
     return B.hist.map(h => {
       const cls = h.res === 'W' ? 'used-w' : (h.res === 'L' || h.res === 'T') ? 'used-l' : 'used-p';
-      return `<span class="chip ${cls}"${teamStyle(h.t)} title="Week ${h.w} — ${esc(L.teams[h.t] || h.t)} — ${h.res ? word[h.res] : 'pending'}"><span class="wk">W${h.w}</span>${esc(h.t)}</span>`;
+      return `<span class="chip ${cls}"${teamStyle(h.t)} title="Week ${h.w} — entry #${h.n} — ${esc(L.teams[h.t] || h.t)} — ${h.res ? word[h.res] : 'pending'}"><span class="wk">W${h.w}</span>${esc(h.t)}</span>`;
     }).join('');
   }
   function availChips(L, D, B) {
@@ -245,7 +250,7 @@
         <div class="mine-head"><span class="t">${esc(g.p.name)} <span class="muted">#${e.entryNumber}</span></span>${badge}
           <span class="muted" style="font-size:12.5px">${B.used.size} used${live ? ` · ${B.remaining.length} available` : ''}</span></div>
         ${cur ? `<div class="hint" style="margin-top:6px">${cur}</div>` : ''}
-        <div class="sub-label">Teams already used</div>
+        <div class="sub-label">Teams already used (all your entries)</div>
         <div class="chips">${usedChips(L, B)}</div>
         ${live ? `<div class="sub-label">Still available${L.seasonComplete ? '' : ` for Week ${D.cw}`}</div>
         <div class="chips">${availChips(L, D, B)}</div>` : ''}
@@ -398,7 +403,7 @@
       <ol>
         <li>${weeksN.length} regular-season weeks. Each week, every live entry picks one team to <b>win outright</b>.</li>
         <li>Loss = eliminated. Tie = ${L.rules.tie === 'loss' ? 'eliminated' : 'push (survive; team is still used)'}. Missed pick = ${L.rules.missedPick === 'eliminated' ? 'eliminated' : 'auto-assigned'}.</li>
-        <li>A team can be used <b>once per entry</b> across the season.</li>
+        <li>A team can be used <b>once per person</b> across the season — a team picked on one of your entries is gone for all of your entries, including rebuys.</li>
         <li>Buy-ins per person, in order: ${L.rules.buyInSchedule.map(money).join(' → ')}. Max ${L.rules.maxEntriesPerPerson} entries per person.</li>
         <li>${esc(L.rules.rebuyText)}</li>
         <li>Picks lock at the first kickoff of the week${D.wk.lock ? ` (this week: ${esc(fmtLock(D.wk.lock))})` : ''} and stay hidden until then${D.showPicks && !D.locked && !L.seasonComplete ? ` — unless every entry is in and the commissioner closes the week early, which is what happened in Week ${D.cw}` : ''}.</li>
