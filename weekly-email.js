@@ -43,12 +43,14 @@ const nameOf = {};
 (L.participants || []).forEach(p => nameOf[p.id] = p.name);
 const label = e => `${nameOf[e.participantId] || e.participantId} #${e.entryNumber}`;
 
-// Every team an entry has burned, week-labelled. Anything still hidden
-// (a submitted pick for a week that has not kicked off) is left out.
+// Every team a PERSON has burned across all of their entries, week-labelled.
+// Used-once is per person, so an entry #2 also carries entry #1's teams.
+// Anything still hidden (a pick for a week that has not kicked off) is left out.
 function used(e) {
-  return Object.keys(e.picks).map(Number).sort((a, b) => a - b)
-    .filter(w => w <= week)
-    .map(w => ({ w, t: e.picks[String(w)], res: (L.results[String(w)] || {})[e.picks[String(w)]] }));
+  return L.entries.filter(x => x.participantId === e.participantId)
+    .flatMap(x => Object.keys(x.picks).map(Number).filter(w => w <= week)
+      .map(w => ({ w, n: x.entryNumber, t: x.picks[String(w)], res: (L.results[String(w)] || {})[x.picks[String(w)]] })))
+    .sort((a, b) => a.w - b.w || a.n - b.n);
 }
 
 const pot = L.entries.reduce((s, e) => s + buyIn(e.entryNumber), 0);
@@ -139,7 +141,7 @@ if (alive.length) {
   html += section(`Still alive — teams already used`, `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
     <tr><th style="${S.th}">Entry</th><th style="${S.th}">Teams used</th><th style="${S.th}text-align:right;">Left</th></tr>
     ${rows(alive.slice().sort((a, b) => label(a).localeCompare(label(b))))}</table>
-    <div style="font-size:12.5px;color:#7a7a75;padding-top:10px;">Green = the pick won, red = it lost or tied. You cannot reuse a team you have already used. Full list of what you have left is on the dashboard under <b>Your picks</b>.</div>`);
+    <div style="font-size:12.5px;color:#7a7a75;padding-top:10px;">Green = the pick won, red = it lost or tied. You cannot reuse a team you have already used on any of your entries. Full list of what you have left is on the dashboard under <b>Your picks</b>.</div>`);
 }
 
 const outAll = L.entries.filter(e => !isLive(e) && e.eliminatedWeek !== week);
@@ -153,7 +155,7 @@ html += `<tr><td style="${S.pad}border-top:1px solid #e3e3df;" align="center">
   <div style="font-size:12.5px;color:#7a7a75;padding-top:10px;">Pick your name under <b>Your picks</b> to see your used and available teams.</div>
 </td></tr>
 <tr><td style="${S.foot}">
-  One team per week, must win outright. Loss or tie or no pick = out. A team can only be used once per entry.
+  One team per week, must win outright. Loss or tie or no pick = out. A team can only be used once per person, across all your entries.
   Buy-ins ${L.rules.buyInSchedule.map(money).join(' → ')}, max ${L.rules.maxEntriesPerPerson} entries. ${esc(L.rules.payoutText)}
 </td></tr>
 </table></td></tr></table></div>`;
