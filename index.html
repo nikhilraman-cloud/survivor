@@ -250,23 +250,35 @@
     if (!pick) return `Week ${D.cw}: <b>no pick submitted yet</b>${D.wk.lock ? ` — due by ${esc(fmtLock(D.wk.lock))}` : ''}`;
     return D.showPicks ? `Week ${D.cw}: <b>${esc(pick)}</b>` : `Week ${D.cw}: pick is in — hidden until kickoff`;
   }
+  // A person's entries, oldest first, plus the one that speaks for them: the live
+  // entry if there is one, otherwise the most recent (eliminated) one.
+  function personState(g) {
+    const ents = [...g.entries].sort((a, b) => a.entryNumber - b.entryNumber);
+    const live = ents.find(isLive) || null;
+    const last = ents[ents.length - 1] || null;
+    return { ents, live, last, ref: live || last, multi: ents.length > 1 };
+  }
+  // One block per PERSON. The used-once rule is per person, so used/available is
+  // the same for every entry of theirs and a block per entry would only repeat it.
+  // Which entry a pick belonged to stays in each chip's tooltip.
   function mineHtml(L, D, g) {
-    return g.entries.map(e => {
-      const B = pickBreakdown(L, D, e), live = isLive(e);
-      const badge = e.status === 'winner' ? '<span class="badge win">Winner</span>'
-        : !live ? `<span class="badge out">Out W${e.eliminatedWeek}${e.eliminationReason ? ' · ' + esc(e.eliminationReason) : ''}</span>`
-        : '<span class="badge alive">Alive</span>';
-      const cur = currentLine(L, D, e);
-      return `<div class="mine-entry">
-        <div class="mine-head"><span class="t">${esc(g.p.name)} <span class="muted">#${e.entryNumber}</span></span>${badge}
-          <span class="muted" style="font-size:12.5px">${B.used.size} used${live ? ` · ${B.remaining.length} available` : ''}</span></div>
-        ${cur ? `<div class="hint" style="margin-top:6px">${cur}</div>` : ''}
-        <div class="sub-label">Teams already used (all your entries)</div>
-        <div class="chips">${usedChips(L, B)}</div>
-        ${live ? `<div class="sub-label">Still available${L.seasonComplete ? '' : ` for Week ${D.cw}`}</div>
-        <div class="chips">${availChips(L, D, B)}</div>` : ''}
-      </div>`;
-    }).join('');
+    const S = personState(g);
+    if (!S.ref) return `<div class="hint">No entries yet.</div>`;
+    const B = pickBreakdown(L, D, S.ref), live = !!S.live;
+    const badge = S.ref.status === 'winner' ? '<span class="badge win">Winner</span>'
+      : !live ? `<span class="badge out">Out W${S.last.eliminatedWeek}${S.last.eliminationReason ? ' · ' + esc(S.last.eliminationReason) : ''}</span>`
+      : '<span class="badge alive">Alive</span>';
+    const cur = live ? currentLine(L, D, S.live) : '';
+    const entryNote = S.multi ? `entry #${S.ref.entryNumber} of ${S.ents.length} · ` : '';
+    return `<div class="mine-entry">
+      <div class="mine-head"><span class="t">${esc(g.p.name)}</span>${badge}
+        <span class="muted" style="font-size:12.5px">${entryNote}${B.used.size} used${live ? ` · ${B.remaining.length} available` : ''}</span></div>
+      ${cur ? `<div class="hint" style="margin-top:6px">${cur}</div>` : ''}
+      <div class="sub-label">Teams already used${S.multi ? ' (all your entries)' : ''}</div>
+      <div class="chips">${usedChips(L, B)}</div>
+      ${live ? `<div class="sub-label">Still available${L.seasonComplete ? '' : ` for Week ${D.cw}`}</div>
+      <div class="chips">${availChips(L, D, B)}</div>` : ''}
+    </div>`;
   }
 
   // ---------- derived ----------
@@ -386,16 +398,17 @@
       <div class="legend"><span class="l-won">Won</span><span class="l-lost">Lost / tie / no pick</span><span class="l-pending">Pending this week</span><span class="l-locked">Locked until kickoff</span><span class="l-future">Future</span><span class="muted">Colored edges = team colors</span><span class="muted">Small number = which entry (buy-in); blue edge = a new entry starts</span></div>
       </div>`);
 
-    // Everyone's used + available teams
-    const roster = [...L.entries].sort((a, b) => (isLive(b) - isLive(a))
-      || D.byP[a.participantId].p.name.localeCompare(D.byP[b.participantId].p.name)
-      || a.entryNumber - b.entryNumber);
-    const rosterHtml = roster.length ? roster.map(e => {
-      const B = pickBreakdown(L, D, e), live = isLive(e);
-      const hasPick = !!e.picks[String(D.cw)];
-      const meta = !live ? `out W${e.eliminatedWeek} · ${B.used.size} used`
+    // Everyone's used + available teams — one row per PERSON (see mineHtml)
+    const roster = Object.values(D.byP).filter(g => g.entries.length)
+      .map(g => ({ g, S: personState(g) }))
+      .sort((a, b) => (!!b.S.live - !!a.S.live) || a.g.p.name.localeCompare(b.g.p.name));
+    const rosterHtml = roster.length ? roster.map(({ g, S }) => {
+      const B = pickBreakdown(L, D, S.ref), live = !!S.live;
+      const hasPick = live && !!S.live.picks[String(D.cw)];
+      const entryNote = S.multi ? ` <span class="muted">#${S.ref.entryNumber} of ${S.ents.length}</span>` : '';
+      const meta = !live ? `out W${S.last.eliminatedWeek} · ${B.used.size} used`
         : `${B.used.size} used · ${B.remaining.length} available${L.seasonComplete ? '' : hasPick ? ' · pick in' : ' · <b>no pick yet</b>'}`;
-      return `<details><summary><span class="name">${esc(D.byP[e.participantId].p.name)} <span class="muted">#${e.entryNumber}</span></span>
+      return `<details><summary><span class="name">${esc(g.p.name)}${entryNote}</span>
         <span class="meta">${meta}</span></summary>
         <div class="sub-label">Used</div><div class="chips">${usedChips(L, B)}</div>
         ${live ? `<div class="sub-label">Available</div><div class="chips">${availChips(L, D, B)}</div>` : ''}</details>`;
