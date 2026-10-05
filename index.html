@@ -12,6 +12,7 @@
     --bad: #d03b3b; --bad-bg: #fbe4e4; --bad-ink: #8f1f1f;
     --warn: #fab219; --warn-bg: #fff3d1; --warn-ink: #6b4a00;
     --future-bg: #f1f1ee; --na-bg: #e9e9e5; --lock-bg: #e6e6e2;
+    --row-alt: #faf9f6;
     --accent: #1f4e79;
     --radius: 10px;
   }
@@ -23,6 +24,7 @@
       --bad-bg: #3f1a1a; --bad-ink: #f0a0a0;
       --warn-bg: #3f3210; --warn-ink: #f5d27a;
       --future-bg: #232321; --na-bg: #1b1b19; --lock-bg: #292926;
+      --row-alt: #262623;
       --accent: #7fb2e6;
     }
   }
@@ -55,8 +57,17 @@
   td .status { display: block; font-size: 11.5px; color: var(--ink-3); }
   tr.out td { opacity: .55; }
   tr.out td:first-child { opacity: 1; color: var(--ink-3); }
-  tr.group-start td { border-top: 2px solid var(--line-strong); }
-  .cell { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 58px; height: 46px; margin: 3px; border-radius: 6px; font-weight: 600; font-size: 13px; }
+  table.grid tbody td { border-bottom: 2px solid var(--line-strong); }
+  table.grid tbody tr:nth-child(even) td { background: var(--row-alt); }
+  table.grid tbody tr:nth-child(even) td:first-child { background: var(--row-alt); }
+  table.grid tbody tr:hover td { background: var(--lock-bg); }
+  table.grid tbody tr:hover td:first-child { background: var(--lock-bg); }
+  .cell { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 68px; height: 46px; margin: 3px; border-radius: 6px; font-weight: 600; font-size: 13px; }
+  .cell { position: relative; }
+  .cell .ent { position: absolute; top: 3px; right: 4px; font-size: 9.5px; font-weight: 700;
+    line-height: 1; color: var(--ink-3); letter-spacing: 0; opacity: .85; }
+  td.entry-start { border-left: 2px solid var(--accent); }
+  td.entry-start .cell .ent { color: var(--accent); opacity: 1; }
   .cell small { font-size: 10.5px; font-weight: 500; letter-spacing: .04em; opacity: .9; }
   .cell.won { background: var(--good-bg); color: var(--good-ink); }
   .cell.lost, .cell.tie, .cell.missed { background: var(--bad-bg); color: var(--bad-ink); }
@@ -335,20 +346,44 @@
       bestWeek: Math.max(...g.entries.map(e => e.eliminatedWeek == null ? 99 : e.eliminatedWeek)) }))
       .sort((a, b) => (b.anyAlive - a.anyAlive) || (b.bestWeek - a.bestWeek) || a.p.name.localeCompare(b.p.name));
     let rows = '';
+    // One row per PERSON. A person's entries run in sequence (a rebuy only starts
+    // after the prior entry is out), so their weeks never overlap and all of a
+    // person's picks fit on a single line. The small number on a cell says which
+    // entry (buy-in) that pick belonged to; it is shown only for multi-entry people.
     groups.forEach(g => {
-      const ents = [...g.entries].sort((a, b) => ((b.status === 'alive' || b.status === 'winner') - (a.status === 'alive' || a.status === 'winner')) || a.entryNumber - b.entryNumber);
-      ents.forEach((e, i) => {
-        const out = !(e.status === 'alive' || e.status === 'winner');
-        const st = e.status === 'winner' ? 'Winner' : out ? `Out W${e.eliminatedWeek}${e.eliminationReason ? ' · ' + e.eliminationReason : ''}` : 'Alive';
-        rows += `<tr class="${out ? 'out' : ''} ${i === 0 ? 'group-start' : ''}"><td><span class="who">${esc(g.p.name)}<small>#${e.entryNumber}</small></span><span class="status">${esc(st)}</span></td>`;
-        weeksN.forEach(w => { const c = cellFor(L, D, e, w); rows += `<td><div class="cell ${c.cls}"${teamStyle(c.main)} title="Week ${w}${c.main ? ': ' + esc(c.main) : ''}">${esc(c.main)}${c.sub ? `<small>${esc(c.sub)}</small>` : ''}</div></td>`; });
-        rows += '</tr>';
+      const ents = [...g.entries].sort((a, b) => a.entryNumber - b.entryNumber);
+      if (!ents.length) return;
+      const multi = ents.length > 1;
+      const live = ents.find(e => e.status === 'alive' || e.status === 'winner');
+      const last = ents[ents.length - 1];
+      const ref = live || last;
+      const out = !live;
+      const st = ref.status === 'winner' ? 'Winner'
+        : out ? `Out W${last.eliminatedWeek}${last.eliminationReason ? ' · ' + last.eliminationReason : ''}`
+        : 'Alive';
+      const tail = multi ? ` · entry #${ref.entryNumber} of ${ents.length}` : '';
+      rows += `<tr class="${out ? 'out' : ''}"><td><span class="who">${esc(g.p.name)}</span><span class="status">${esc(st + tail)}</span></td>`;
+      weeksN.forEach(w => {
+        const owner = ents.find(e => w >= e.startWeek && (e.eliminatedWeek == null || w <= e.eliminatedWeek));
+        let c, tag = '', who = '', tdCls = '';
+        if (owner) {
+          c = cellFor(L, D, owner, w);
+          if (multi) {
+            who = ` · entry #${owner.entryNumber}`;
+            if (c.main) tag = `<span class="ent">${owner.entryNumber}</span>`;
+            if (owner.entryNumber > 1 && w === owner.startWeek) tdCls = 'entry-start';
+          }
+        } else {
+          c = (w < ents[0].startWeek) ? { cls: 'na', main: '—', sub: '' } : { cls: 'gone', main: '', sub: '' };
+        }
+        rows += `<td class="${tdCls}"><div class="cell ${c.cls}"${teamStyle(c.main)} title="Week ${w}${who}${c.main ? ': ' + esc(c.main) : ''}">${tag}${esc(c.main)}${c.sub ? `<small>${esc(c.sub)}</small>` : ''}</div></td>`;
       });
+      rows += '</tr>';
     });
     html.push(`<div class="card"><h2>Standings</h2>
-      <div class="gridwrap"><table class="grid"><thead><tr><th>Entry</th>${weeksN.map(w => `<th class="${w === D.cw ? 'cur' : ''}">W${w}</th>`).join('')}</tr></thead>
+      <div class="gridwrap"><table class="grid"><thead><tr><th>Player</th>${weeksN.map(w => `<th class="${w === D.cw ? 'cur' : ''}">W${w}</th>`).join('')}</tr></thead>
       <tbody>${rows || `<tr><td colspan="${weeksN.length + 1}" class="empty" style="text-align:left">No entries.</td></tr>`}</tbody></table></div>
-      <div class="legend"><span class="l-won">Won</span><span class="l-lost">Lost / tie / no pick</span><span class="l-pending">Pending this week</span><span class="l-locked">Locked until kickoff</span><span class="l-future">Future</span><span class="muted">Colored edges = team colors</span></div>
+      <div class="legend"><span class="l-won">Won</span><span class="l-lost">Lost / tie / no pick</span><span class="l-pending">Pending this week</span><span class="l-locked">Locked until kickoff</span><span class="l-future">Future</span><span class="muted">Colored edges = team colors</span><span class="muted">Small number = which entry (buy-in); blue edge = a new entry starts</span></div>
       </div>`);
 
     // Everyone's used + available teams
