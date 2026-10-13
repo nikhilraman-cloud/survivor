@@ -1,10 +1,10 @@
 {
   "leagueName": "Office Survivor 2026",
   "season": 2026,
-  "currentWeek": 5,
+  "currentWeek": 6,
   "showCurrentWeekPicks": false,
   "seasonComplete": false,
-  "lastUpdated": "2026-10-09",
+  "lastUpdated": "2026-10-13",
   "rules": {
     "payout": "winner-take-all",
     "payoutText": "Last surviving entry wins the full pot. If multiple entries survive Week 18, they split it equally. If every remaining entry is eliminated in the same week, those entries split the pot.",
@@ -426,9 +426,9 @@
       "participantId": "nosher",
       "entryNumber": 2,
       "startWeek": 2,
-      "status": "alive",
-      "eliminatedWeek": null,
-      "eliminationReason": null,
+      "status": "eliminated",
+      "eliminatedWeek": 5,
+      "eliminationReason": "loss",
       "picks": {
         "2": "SF",
         "3": "KC",
@@ -441,9 +441,9 @@
       "participantId": "rjahn",
       "entryNumber": 2,
       "startWeek": 2,
-      "status": "alive",
-      "eliminatedWeek": null,
-      "eliminationReason": null,
+      "status": "eliminated",
+      "eliminatedWeek": 5,
+      "eliminationReason": "loss",
       "picks": {
         "2": "SF",
         "3": "DET",
@@ -470,9 +470,9 @@
       "participantId": "btucker",
       "entryNumber": 2,
       "startWeek": 2,
-      "status": "alive",
-      "eliminatedWeek": null,
-      "eliminationReason": null,
+      "status": "eliminated",
+      "eliminatedWeek": 5,
+      "eliminationReason": "loss",
       "picks": {
         "2": "SF",
         "3": "DET",
@@ -500,9 +500,9 @@
       "participantId": "nraman",
       "entryNumber": 2,
       "startWeek": 3,
-      "status": "alive",
-      "eliminatedWeek": null,
-      "eliminationReason": null,
+      "status": "eliminated",
+      "eliminatedWeek": 5,
+      "eliminationReason": "loss",
       "picks": {
         "3": "KC",
         "4": "SEA",
@@ -531,6 +531,10 @@
       "BAL": "W",
       "BUF": "L",
       "SEA": "W"
+    },
+    "5": {
+      "HOU": "W",
+      "DAL": "L"
     }
   },
   "payouts": []
