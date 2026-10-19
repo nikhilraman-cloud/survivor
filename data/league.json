@@ -2,7 +2,7 @@
   "leagueName": "Office Survivor 2026",
   "season": 2026,
   "currentWeek": 6,
-  "showCurrentWeekPicks": false,
+  "showCurrentWeekPicks": true,
   "seasonComplete": false,
   "lastUpdated": "2026-10-15",
   "rules": {
@@ -56,7 +56,7 @@
         "MIA",
         "MIN"
       ],
-      "note": "Thursday night kickoff"
+      "note": "Thursday night kickoff. The Osher Week 6 rebuy (entry #3) with LAR, and the Wender NE pick, were submitted to the commissioner before the 8:15 PM ET lock but recorded after it. Honored as timely."
     },
     "7": {
       "lock": "2026-10-22T20:15:00-04:00",
@@ -356,7 +356,8 @@
         "2": "SF",
         "3": "KC",
         "4": "MIN",
-        "5": "HOU"
+        "5": "HOU",
+        "6": "NE"
       }
     },
     {
@@ -508,6 +509,18 @@
         "3": "KC",
         "4": "SEA",
         "5": "DAL"
+      }
+    },
+    {
+      "id": "nosher-3",
+      "participantId": "nosher",
+      "entryNumber": 3,
+      "startWeek": 6,
+      "status": "alive",
+      "eliminatedWeek": null,
+      "eliminationReason": null,
+      "picks": {
+        "6": "LAR"
       }
     }
   ],
