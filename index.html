@@ -37,6 +37,30 @@
   .muted { color: var(--ink-3); }
   .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; margin-top: 16px; }
   .banner { border-left: 4px solid var(--warn); }
+
+  /* Season-winner hero */
+  .champ { position: relative; overflow: hidden; margin-top: 0; padding: 26px 22px 24px;
+    border: 1px solid #d9b85a; background: linear-gradient(135deg, #fff8e1 0%, #ffedb3 55%, #ffe08a 100%); color: #3b2a00; }
+  .champ::before { content: ""; position: absolute; inset: -40% -10% auto; height: 170%;
+    background: radial-gradient(closest-side, rgba(255,255,255,.75), rgba(255,255,255,0) 70%); pointer-events: none; }
+  .champ-inner { position: relative; display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
+  .champ svg { width: 96px; height: 96px; flex: 0 0 auto; filter: drop-shadow(0 6px 10px rgba(120,80,0,.25)); }
+  .champ .kicker { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; font-weight: 700; color: #8a6200; }
+  .champ .name { font-size: 34px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; margin: 4px 0 6px; }
+  .champ .line { font-size: 15px; color: #5a4300; }
+  .champ .line b { color: #3b2a00; }
+  .champ .confetti { position: absolute; top: -6px; width: 8px; height: 14px; border-radius: 2px; opacity: .85;
+    animation: fall 5s linear infinite; }
+  @keyframes fall { 0% { transform: translateY(-20px) rotate(0deg); } 100% { transform: translateY(260px) rotate(540deg); } }
+  @media (prefers-reduced-motion: reduce) { .champ .confetti { animation: none; display: none; } }
+  @media (prefers-color-scheme: dark) {
+    .champ { border-color: #8a6a1f; background: linear-gradient(135deg, #3a2e0e 0%, #4a3a10 55%, #5a4612 100%); color: #ffe9a8; }
+    .champ::before { background: radial-gradient(closest-side, rgba(255,220,120,.18), rgba(255,220,120,0) 70%); }
+    .champ .kicker { color: #e3b84a; }
+    .champ .line { color: #d9c48a; }
+    .champ .line b { color: #ffe9a8; }
+  }
+  @media (max-width: 520px) { .champ .name { font-size: 28px; } .champ svg { width: 72px; height: 72px; } }
   .header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 16px; }
   .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-top: 14px; }
   .stat { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
@@ -320,6 +344,33 @@
     const weeksN = Object.keys(L.weeks).map(Number).sort((a, b) => a - b);
     const html = [];
 
+    // Season-winner hero — only once the commissioner closes the season
+    if (L.seasonComplete && D.winners.length) {
+      const pays = (L.payouts && L.payouts.length) ? L.payouts : D.winners.map(e => ({ entryId: e.id, amount: D.pot / D.winners.length }));
+      const names = D.winners.map(e => esc(D.byP[e.participantId] ? D.byP[e.participantId].p.name : e.participantId));
+      const w = D.winners[0];
+      const run = Object.keys(w.picks).map(Number).sort((a, b) => a - b).map(k => w.picks[String(k)]);
+      const amt = pays.find(p => p.entryId === w.id);
+      const conf = ['#e0423c', '#2f7fe0', '#2eaa5a', '#f2b632', '#9a5ce0', '#ff7f2a'];
+      const confetti = Array.from({ length: 18 }, (_, i) =>
+        `<span class="confetti" style="left:${(i * 5.6 + 2).toFixed(1)}%;background:${conf[i % conf.length]};animation-delay:${(-(i * 0.37) % 5).toFixed(2)}s;animation-duration:${(4.2 + (i % 4) * 0.6).toFixed(1)}s"></span>`).join('');
+      html.push(`<div class="card champ">${confetti}<div class="champ-inner">
+        <svg viewBox="0 0 96 96" aria-hidden="true">
+          <defs><linearGradient id="gold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe680"/><stop offset=".55" stop-color="#f2b632"/><stop offset="1" stop-color="#b87d10"/></linearGradient></defs>
+          <path d="M26 14h44v26c0 13-10 23-22 23S26 53 26 40V14z" fill="url(#gold)"/>
+          <path d="M26 20H14c-2 0-3 1-3 3 0 13 8 22 17 24v-7c-5-2-9-8-10-14h8v-6zM70 20h12c2 0 3 1 3 3 0 13-8 22-17 24v-7c5-2 9-8 10-14h-8v-6z" fill="url(#gold)"/>
+          <rect x="42" y="62" width="12" height="10" fill="#c98c14"/>
+          <path d="M30 72h36v6c0 2-1 3-3 3H33c-2 0-3-1-3-3v-6z" fill="url(#gold)"/>
+          <rect x="26" y="80" width="44" height="6" rx="2" fill="#8a5c0c"/>
+          <path d="M48 24l3.6 7.3 8 1.2-5.8 5.6 1.4 8L48 42.3l-7.2 3.8 1.4-8-5.8-5.6 8-1.2L48 24z" fill="#fff6d0" opacity=".9"/>
+        </svg>
+        <div>
+          <div class="kicker">${D.winners.length > 1 ? 'Season champions' : 'Season champion'}</div>
+          <div class="name">${names.join(' & ')}</div>
+          <div class="line">${D.winners.length > 1 ? `Split the <b>${money(D.pot)}</b> pot` : `Last entry standing &middot; takes the <b>${money(amt ? amt.amount : D.pot)}</b> pot`}${run.length ? ` &middot; ${run.length}-week run: <b>${run.map(esc).join(' &rarr; ')}</b>` : ''}</div>
+        </div></div></div>`);
+    }
+
     // Header
     const people = Object.keys(D.byP).length;
     html.push(`<div class="card">
@@ -327,7 +378,7 @@
         <span class="muted">${L.seasonComplete ? 'Season complete' : `Week ${D.cw} of ${weeksN.length}`}${L.lastUpdated ? ` · updated ${esc(L.lastUpdated)}` : ''}</span></div>
       <div class="stats">
         <div class="stat"><div class="label">Pot</div><div class="value">${money(D.pot)}</div><div class="sub">${L.entries.length} entr${L.entries.length === 1 ? 'y' : 'ies'} · ${people} ${people === 1 ? 'person' : 'people'}</div></div>
-        <div class="stat"><div class="label">Alive</div><div class="value">${D.alive.length} <span class="muted" style="font-size:15px;font-weight:500">/ ${L.entries.length}</span></div><div class="sub">${L.entries.length - D.alive.length} eliminated</div></div>
+        <div class="stat"><div class="label">${L.seasonComplete ? 'Final' : 'Alive'}</div><div class="value">${D.alive.length} <span class="muted" style="font-size:15px;font-weight:500">/ ${L.entries.length}</span></div><div class="sub">${L.seasonComplete ? `${D.winners.length} winner${D.winners.length === 1 ? '' : 's'} · ` : ''}${L.entries.length - D.alive.length} eliminated</div></div>
         ${L.seasonComplete ? '' : `<div class="stat"><div class="label">Week ${D.cw} picks lock</div><div class="value" style="font-size:17px">${D.wk.lock ? esc(fmtLock(D.wk.lock)) : '—'}</div><div class="sub">${D.wk.lock ? esc(countdown(D.wk.lock)) : ''}${D.wk.byes && D.wk.byes.length ? ` · byes: ${D.wk.byes.join(', ')}` : ''}</div></div>`}
         ${L.seasonComplete ? '' : `<div class="stat"><div class="label">Week ${D.cw} picks</div><div class="value" style="font-size:17px">${D.showPicks ? 'Visible' : 'Hidden until kickoff'}</div><div class="sub">${D.alive.filter(e => !e.picks[String(D.cw)] && e.status === 'alive').length} alive entr${D.alive.filter(e => !e.picks[String(D.cw)] && e.status === 'alive').length === 1 ? 'y' : 'ies'} still without a pick</div></div>`}
       </div></div>`);
