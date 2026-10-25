@@ -3,8 +3,8 @@
   "season": 2026,
   "currentWeek": 7,
   "showCurrentWeekPicks": false,
-  "seasonComplete": false,
-  "lastUpdated": "2026-10-19",
+  "seasonComplete": true,
+  "lastUpdated": "2026-10-25",
   "rules": {
     "payout": "winner-take-all",
     "payoutText": "Last surviving entry wins the full pot. If multiple entries survive Week 18, they split it equally. If every remaining entry is eliminated in the same week, those entries split the pot.",
@@ -348,7 +348,7 @@
       "participantId": "jwender",
       "entryNumber": 1,
       "startWeek": 1,
-      "status": "alive",
+      "status": "winner",
       "eliminatedWeek": null,
       "eliminationReason": null,
       "picks": {
@@ -555,5 +555,10 @@
       "NE": "W"
     }
   },
-  "payouts": []
+  "payouts": [
+    {
+      "entryId": "jwender-1",
+      "amount": 680
+    }
+  ]
 }
